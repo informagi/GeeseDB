@@ -1,6 +1,7 @@
 #! /usr/bin/env python3.6
 
 import argparse
+
 from geesedb.connection.connection import DBConnection
 
 
