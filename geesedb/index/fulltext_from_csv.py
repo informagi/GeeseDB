@@ -4,7 +4,7 @@ import argparse
 import duckdb
 import os
 
-from geesedb.connection.connection import DBConnection
+from geesedb.connection import DBConnection
 
 
 class OldDog:

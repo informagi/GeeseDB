@@ -2,7 +2,7 @@
 
 import argparse
 
-from geesedb.connection.connection import DBConnection
+from geesedb.connection import DBConnection
 
 
 class Searcher:
