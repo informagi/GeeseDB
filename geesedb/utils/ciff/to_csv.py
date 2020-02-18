@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-import geesedb.utils.ciff.ciff_pb2
+import .ciff_pb2
 
 
 class ToCSV:
