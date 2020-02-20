@@ -7,7 +7,7 @@ import os
 from ..connection import DBConnection
 
 
-class OldDog:
+class FullTextFromCSV:
     """
     Class for creating tables from csv files as in the old dog paper:
     - https://dl.acm.org/doi/10.1145/2600428.2609460
@@ -140,4 +140,4 @@ if __name__ == '__main__':
                         default='|',
                         help='Delimiter that separates the columns in the csv files.')
     args = parser.parse_args()
-    OldDog(args)
+    FullTextFromCSV(args)
