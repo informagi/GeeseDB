@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-from connection import DBConnection
+from .connection import DBConnection
 
 __all__ = ['DBConnection']
