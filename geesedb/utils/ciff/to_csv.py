@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-import .ciff_pb2
+from . import ciff_pb2
 
 
 class ToCSV:
@@ -46,7 +46,7 @@ class ToCSV:
             next_pos, pos = 0, 0
             term_id = 0
             while pos < len(data):
-                posting_list = geesedb.utils.ciff.ciff_pb2.PostingsList()
+                posting_list = ciff_pb2.PostingsList()
                 next_pos, pos = self.decode(data, pos)
                 posting_list.ParseFromString(data[pos: pos + next_pos])
                 pos += next_pos
