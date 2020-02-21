@@ -1,3 +1,3 @@
 duckdb>=0.1.3
-google
-protobuf
+google>2.0
+protobuf>=3
