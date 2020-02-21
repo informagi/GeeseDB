@@ -11,13 +11,16 @@ class ToCSV:
     Class for creating csv files that represent tables in the old dog paper:
     - https://dl.acm.org/doi/10.1145/2600428.2609460
     """
-    def __init__(self, cl_args):
-        self.postings_file = cl_args.protobuf_file
-        self.docs_file = cl_args.docs_file
+    def __init__(self, args=sys.argv[1:]):
+        parser = self.parse_args()
+
+        self.arguments = parser.parse_args(args)
+        self.postings_file = self.arguments.protobuf_file
+        self.docs_file = self.arguments.docs_file
         if self.postings_file:
-            self.create_term_files(cl_args.output_term_dict, cl_args.output_term_doc)
+            self.create_term_files(self.arguments.output_term_dict, self.arguments.output_term_doc)
         if self.docs_file:
-            self.create_doc_file(cl_args.output_docs)
+            self.create_doc_file(self.arguments.output_docs)
 
     @staticmethod
     def decode(buffer, pos):
@@ -48,7 +51,7 @@ class ToCSV:
             while pos < len(data):
                 posting_list = ciff_pb2.PostingsList()
                 next_pos, pos = self.decode(data, pos)
-                posting_list.ParseFromString(data[pos: pos + next_pos])
+                posting_list.ParseFromString(data[pos:pos+next_pos])
                 pos += next_pos
 
                 term_dict_writer.write(f'{term_id}|{posting_list.df}|{posting_list.term}\n')
@@ -65,36 +68,39 @@ class ToCSV:
                 doc_id, trec_id, length = line.strip().split("\t")
                 doc_writer.write(f'{trec_id}|{doc_id}|{length}\n')
 
+    @staticmethod
+    def parse_args():
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-p',
+                            '--protobuf_file',
+                            required='--output_term_dict' in sys.argv and
+                                     '--output_term_doc' in sys.argv,
+                            metavar='[file]',
+                            help='Location of the protobuf file, if this is included ' +
+                                 'output files for term related files should also be specified.')
+        parser.add_argument('-d',
+                            '--docs_file',
+                            required='--output_term_doc' in sys.argv,
+                            metavar='[file]',
+                            help='Location of the document metadata file, if this is included ' +
+                                 'the output file for documents should also be specified.')
+        parser.add_argument('-o',
+                            '--output_docs',
+                            required='--docs_file' in sys.argv,
+                            metavar='[file]',
+                            help='Output csv file for the docs table.')
+        parser.add_argument('-t',
+                            '--output_term_dict',
+                            required='--protobuf_file' in sys.argv,
+                            metavar='[file]',
+                            help='Output csv file for the term dictionary table.')
+        parser.add_argument('-e',
+                            '--output_term_doc',
+                            required='--protobuf_file' in sys.argv,
+                            metavar='[file]',
+                            help='Output csv file for the term doc mapper table.')
+        return parser
+
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-p',
-                        '--protobuf_file',
-                        required='--output_term_dict' in sys.argv and
-                                 '--output_term_doc' in sys.argv,
-                        metavar='[file]',
-                        help='Location of the protobuf file, if this is included ' +
-                             'output files for term related files should also be specified.')
-    parser.add_argument('-d',
-                        '--docs_file',
-                        required='--output_term_doc' in sys.argv,
-                        metavar='[file]',
-                        help='Location of the document metadata file, if this is included ' +
-                             'the output file for documents should also be specified.')
-    parser.add_argument('-o',
-                        '--output_docs',
-                        required='--docs_file' in sys.argv,
-                        metavar='[file]',
-                        help='Output csv file for the docs table.')
-    parser.add_argument('-t',
-                        '--output_term_dict',
-                        required='--protobuf_file' in sys.argv,
-                        metavar='[file]',
-                        help='Output csv file for the term dictionary table.')
-    parser.add_argument('-e',
-                        '--output_term_doc',
-                        required='--protobuf_file' in sys.argv,
-                        metavar='[file]',
-                        help='Output csv file for the term doc mapper table.')
-    args = parser.parse_args()
-    ToCSV(args)
+    ToCSV()

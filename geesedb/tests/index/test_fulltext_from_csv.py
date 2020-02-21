@@ -7,9 +7,9 @@ def test_load_csv_example_files():
     index = FullTextFromCSV(
         args=[
             '-d', ':memory:',
-            '-di', path.dirname(path.dirname(__file__)) + '/resources/example_files/example_docs.csv',
-            '-ti', path.dirname(path.dirname(__file__)) + '/resources/example_files/example_term_dict.csv',
-            '-oi', path.dirname(path.dirname(__file__)) + '/resources/example_files/example_term_doc.csv'
+            '-di', path.dirname(path.dirname(__file__)) + '/resources/csv/example_docs.csv',
+            '-ti', path.dirname(path.dirname(__file__)) + '/resources/csv/example_term_dict.csv',
+            '-oi', path.dirname(path.dirname(__file__)) + '/resources/csv/example_term_doc.csv'
         ]
     )
     index.cursor.execute("SELECT * FROM docs;")
