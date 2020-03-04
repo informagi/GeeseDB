@@ -17,7 +17,7 @@ def test_load_csv_example_files():
 def test_load_csv_use_existing_database_does_not_exist():
     try:
         FullTextFromCSV(database='test_database',
-                        use_existing_database=True
+                        use_existing_db=True
                         )
         assert False
     except IOError:
