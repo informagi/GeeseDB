@@ -3,20 +3,64 @@
 import argparse
 
 from ..connection import DBConnection
+from ..search import RobertsonBM25
 
 
 class Searcher:
 
-    @staticmethod
-    def _parse_search_arguments():
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--database', required=True, help='Name of the database / index')
-        return parser.parse_args()
+    def __init__(self, **kwargs):
+        self.arguments = self.get_arguments(kwargs)
+        self.db_connection = DBConnection(self.arguments['database'])
+        self.ranking_method = None
+        self.fetch = self.set_return_type()
+        if self.arguments['retrieval_method'] == 'BM25_robertson':
+            self.ranking_method = RobertsonBM25(self.arguments['k1'], self.arguments['b'])
 
-    def __init__(self):
-        self.args = self._parse_search_arguments()
-        self.db_connection = DBConnection(self.args.database)
+    @staticmethod
+    def get_arguments(kwargs):
+        arguments = {
+            'database': None,
+            'retrieval_method': 'BM25_robertson',
+            'k1': 0.9,
+            'b': 0.4,
+            'return_type': 'tuple'
+        }
+        for key, item in arguments.items():
+            if kwargs.get(key) is not None:
+                arguments[key] = kwargs.get(key)
+        if arguments['database'] is None:
+            raise IOError('database path needs to be provided')
+        return arguments
+
+    def set_return_type(self):
+        if self.arguments['return_type'] == 'tuple':
+            fetch = self.db_connection.cursor.fetchall
+        elif self.arguments['return_type'] == 'numpy':
+            fetch = self.db_connection.cursor.fetchnumpy
+        else:
+            fetch = self.db_connection.cursor.fetchdf
+        return fetch
+
+    def search_topic(self, topic):
+        query = self.ranking_method.construct_query(topic)
+        self.db_connection.cursor.execute(query)
+        return self.fetch()
 
 
 if __name__ == '__main__':
-    Searcher()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d',
+                        '--database',
+                        required=True,
+                        help='Name of the database / index')
+    parser.add_argument('-r',
+                        '--retrieval_method',
+                        choices=['BM25_robertson'],
+                        help="Use the Robertson's BM25 ranking function")
+    parser.add_argument('-k1')
+    parser.add_argument('-b')
+    parser.add_argument('-t',
+                        '--return_type',
+                        choices=['numpy', 'data_frame', 'tuple']
+                        )
+    Searcher(**vars(parser.parse_args()))
