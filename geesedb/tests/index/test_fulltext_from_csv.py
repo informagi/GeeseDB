@@ -5,9 +5,10 @@ from ...index import FullTextFromCSV
 
 def test_load_csv_example_files():
     index = FullTextFromCSV(database=':memory:',
-                            docs_file=path.dirname(path.dirname(__file__))+'/resources/csv/example_docs.csv',
-                            term_dict_file=path.dirname(path.dirname(__file__))+'/resources/csv/example_term_dict.csv',
-                            term_doc_file=path.dirname(path.dirname(__file__))+'/resources/csv/example_term_doc.csv'
+                            docs_file=path.dirname(path.dirname(__file__)) + '/resources/csv/example_docs.csv',
+                            term_dict_file=path.dirname(
+                                path.dirname(__file__)) + '/resources/csv/example_term_dict.csv',
+                            term_doc_file=path.dirname(path.dirname(__file__)) + '/resources/csv/example_term_doc.csv'
                             )
     index.cursor.execute("SELECT * FROM docs;")
     assert index.cursor.fetchone() == ['document_0', 0, 3]
