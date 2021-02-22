@@ -73,7 +73,7 @@ class FullTextFromCSV:
             self.cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
             self.connection.rollback()
             raise IOError('Table already exists.')
-        except duckdb.DatabaseError:
+        except:
             pass
         query = f'CREATE TABLE {table_name} ({", ".join([f"{a} {b}" for a, b in zip(column_names, column_types)])});'
         self.cursor.execute(query)

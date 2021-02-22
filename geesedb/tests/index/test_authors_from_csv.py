@@ -10,4 +10,4 @@ def test_load_csv_example_files():
                            )
 
     index.cursor.execute("SELECT * FROM doc_author;")
-    assert index.cursor.fetchone() == ['b2e89334-33f9-11e1-825f-dabc29fd7071', 'Mark Giannotto']
+    assert index.cursor.fetchone() == ('b2e89334-33f9-11e1-825f-dabc29fd7071', 'Mark Giannotto')
