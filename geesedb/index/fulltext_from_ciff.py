@@ -1,7 +1,6 @@
 #! /usr/bin/env python3.6
 
 import argparse
-import duckdb
 import gzip
 import os
 
@@ -77,7 +76,7 @@ class FullTextFromCiff:
             self.cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
             self.connection.rollback()
             raise IOError('Table already exists.')
-        except:
+        except RuntimeError:
             pass
         query = f'CREATE TABLE {table_name} ({", ".join([f"{a} {b}" for a, b in zip(column_names, column_types)])});'
         self.cursor.execute(query)
@@ -126,7 +125,7 @@ class FullTextFromCiff:
                 f"VALUES ({term_id},{postings_list.df},'{postings_list.term}')"
             try:
                 self.cursor.execute(q)
-            except duckdb.DatabaseError:
+            except RuntimeError:
                 print(q)
             for posting in postings_list.postings:
                 q = f'INSERT INTO {self.arguments["table_names"][2]} ' \
