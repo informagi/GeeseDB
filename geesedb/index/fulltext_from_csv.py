@@ -47,7 +47,7 @@ class FullTextFromCSV:
             'columns_names_term_doc': ['term_id', 'doc_id', 'tf'],
             'docs_file': 'docs.csv',
             'term_dict_file': 'dict.csv',
-            'term_doc_file': 'term_docs.csv',
+            'term_doc_file': 'term_doc.csv',
             'delimiter': '|'
         }
         for key, item in arguments.items():
