@@ -7,6 +7,7 @@ from ..connection import DBConnection
 class AuthorsFromCSV:
     """
     Class for creating table from csv file that contains author information
+    Author - doc
     """
     _COLUMN_TYPES = ['STRING', 'STRING']
 
@@ -25,7 +26,7 @@ class AuthorsFromCSV:
 
         if not self.arguments['use_existing_tables']:
             self.create_table(self.arguments['table_name'], self.arguments['columns_names'], self._COLUMN_TYPES)
-        self.fill_table(self.arguments['table_name'], self.arguments['doc_author_file'], self.arguments['delimiter'])
+        self.fill_table(self.arguments['table_name'], self.arguments['author_doc_file'], self.arguments['delimiter'])
 
     @staticmethod
     def get_arguments(kwargs):
@@ -33,9 +34,9 @@ class AuthorsFromCSV:
             'database': None,
             'use_existing_db': False,
             'use_existing_tables': False,
-            'doc_author_file': 'doc_author.csv',
-            'table_name': 'doc_author',
-            'columns_names': ['doc_id', 'author'],
+            'author_doc_file': 'author_doc.csv',
+            'table_name': 'author_doc',
+            'columns_names': ['author', 'doc'],
             'delimiter': '|'
         }
         for key, item in arguments.items():
@@ -84,7 +85,7 @@ if __name__ == '__main__':
                         action='store_true',
                         help='Use existing tables.')
     parser.add_argument('-a',
-                        '--doc_author_file',
+                        '--author_doc_file',
                         metavar='[file]',
                         help='Filename for the csv file containing the data for the docs table.')
     parser.add_argument('-t',
@@ -92,12 +93,12 @@ if __name__ == '__main__':
                         metavar='[string]',
                         help='Decide on the table name you want to fill if they exist, ' +
                              'or create and fill them if they do not exist. If no name ' +
-                             'is given the default value "doc_author" are being used.')
+                             'is given the default value "author_doc" are being used.')
     parser.add_argument('-c',
                         '--columns_names',
                         metavar='[string]',
                         nargs=2,
-                        help='Column names for the doc-author table.')
+                        help='Column names for the author-doc table.')
     parser.add_argument('-e',
                         '--delimiter',
                         help='Delimiter that separates the columns in the csv files.')
