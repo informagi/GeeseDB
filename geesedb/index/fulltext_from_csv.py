@@ -4,6 +4,7 @@ import argparse
 import os
 
 from ..connection import DBConnection
+from .utils import _fill_empty_table_with_csv, _create_table
 
 
 class FullTextFromCSV:
@@ -64,18 +65,8 @@ class FullTextFromCSV:
         ]
         self.connection.begin()
         for table_name, c_names, c_types in zip(self.arguments['table_names'], column_names, self._COLUMN_TYPES):
-            self.create_table(table_name, c_names, c_types)
+            _create_table(self.connection, table_name, c_names, c_types)
         self.connection.commit()
-
-    def create_table(self, table_name, column_names, column_types):
-        try:
-            self.cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
-            self.connection.rollback()
-            raise IOError('Table already exists.')
-        except RuntimeError:
-            pass
-        query = f'CREATE TABLE {table_name} ({", ".join([f"{a} {b}" for a, b in zip(column_names, column_types)])});'
-        self.cursor.execute(query)
 
     def fill_tables(self):
         file_names = [
@@ -85,16 +76,8 @@ class FullTextFromCSV:
         ]
         self.connection.begin()
         for table_name, file_name in zip(self.arguments['table_names'], file_names):
-            self.fill_table(table_name, file_name, self.arguments['delimiter'])
+            _fill_empty_table_with_csv(self.connection, table_name, file_name, self.arguments['delimiter'])
         self.connection.commit()
-
-    def fill_table(self, table_name, file_name, delimiter="|"):
-        self.cursor.execute(f'SELECT COUNT(*) FROM {table_name};')
-        if self.cursor.fetchone()[0] > 0:
-            self.connection.rollback()
-            raise IOError('The tables are not empty.')
-        query = f"COPY {table_name} FROM '{file_name}' WITH DELIMITER '{delimiter}';"
-        self.cursor.execute(query)
 
 
 if __name__ == '__main__':

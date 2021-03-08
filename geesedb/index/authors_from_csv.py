@@ -2,6 +2,7 @@ import argparse
 import os
 
 from ..connection import DBConnection
+from .utils import _create_table, _fill_empty_table_with_csv
 
 
 class AuthorsFromCSV:
@@ -25,8 +26,10 @@ class AuthorsFromCSV:
         self.cursor = db_connection.cursor
 
         if not self.arguments['use_existing_tables']:
-            self.create_table(self.arguments['table_name'], self.arguments['columns_names'], self._COLUMN_TYPES)
-        self.fill_table(self.arguments['table_name'], self.arguments['author_doc_file'], self.arguments['delimiter'])
+            _create_table(self.connection, self.arguments['table_name'], self.arguments['columns_names'],
+                          self._COLUMN_TYPES)
+        _fill_empty_table_with_csv(self. connection, self.arguments['table_name'], self.arguments['author_doc_file'],
+                                   self.arguments['delimiter'])
 
     @staticmethod
     def get_arguments(kwargs):
@@ -45,28 +48,6 @@ class AuthorsFromCSV:
         if arguments['database'] is None:
             raise IOError('database path needs to be provided')
         return arguments
-
-    def create_table(self, table_name, column_names, column_types):
-        self.connection.begin()
-        try:
-            self.cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
-            self.connection.rollback()
-            raise IOError('Table already exists.')
-        except RuntimeError:  # If the table does not exists you get a RuntimeError
-            pass
-        query = f'CREATE TABLE {table_name} ({", ".join([f"{a} {b}" for a, b in zip(column_names, column_types)])});'
-        self.cursor.execute(query)
-        self.connection.commit()
-
-    def fill_table(self, table_name, file_name, delimiter):
-        self.connection.begin()
-        self.cursor.execute(f'SELECT COUNT(*) FROM {table_name};')
-        if self.cursor.fetchone()[0] > 0:
-            self.connection.rollback()
-            raise IOError('The tables are not empty.')
-        query = f"COPY {table_name} FROM '{file_name}' WITH DELIMITER '{delimiter}';"
-        self.cursor.execute(query)
-        self.connection.commit()
 
 
 if __name__ == '__main__':
