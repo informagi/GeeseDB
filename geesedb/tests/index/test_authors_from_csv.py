@@ -6,7 +6,7 @@ from ...index import AuthorsFromCSV
 def test_load_csv_example_files():
     index = AuthorsFromCSV(database=':memory:',
                            doc_author_file=path.dirname(
-                               path.dirname(__file__)) + '/resources/csv/example_docs_authors.csv'
+                               path.dirname(__file__)) + '/resources/csv/example_author_doc.csv'
                            )
 
     index.cursor.execute("SELECT * FROM doc_author;")
