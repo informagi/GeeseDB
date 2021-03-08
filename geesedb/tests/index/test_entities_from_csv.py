@@ -9,8 +9,8 @@ def test_load_csv_example_files():
                                 path.dirname(__file__)) + '/resources/csv/example_entity_doc.csv'
                             )
 
-    index.cursor.execute("SELECT * FROM entity_doc;")
-    first = index.cursor.fetchone()
+    index.connection.execute("SELECT * FROM entity_doc;")
+    first = index.connection.fetchone()
     assert first[0] == 0
     assert first[1] == 11
     assert first[2] == 'Danny Coale'

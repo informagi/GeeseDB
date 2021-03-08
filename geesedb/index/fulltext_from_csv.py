@@ -29,7 +29,6 @@ class FullTextFromCSV:
             raise IOError('Database does not exist.')
         db_connection = DBConnection(self.arguments['database'])
         self.connection = db_connection.connection
-        self.cursor = db_connection.cursor
 
         if not self.arguments['use_existing_db']:
             self.create_tables()

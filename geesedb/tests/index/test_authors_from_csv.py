@@ -9,5 +9,5 @@ def test_load_csv_example_files():
                                path.dirname(__file__)) + '/resources/csv/example_author_doc.csv'
                            )
 
-    index.cursor.execute("SELECT * FROM author_doc;")
-    assert index.cursor.fetchone() == ('Mark Giannotto', 'b2e89334-33f9-11e1-825f-dabc29fd7071')
+    index.connection.execute("SELECT * FROM author_doc;")
+    assert index.connection.fetchone() == ('Mark Giannotto', 'b2e89334-33f9-11e1-825f-dabc29fd7071')
