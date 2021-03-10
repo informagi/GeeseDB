@@ -2,9 +2,10 @@
 
 import argparse
 import os
+from typing import Any, List
 
-from ..connection import DBConnection
 from .utils import _fill_empty_table_with_csv, _create_table
+from ..connection import DBConnection
 
 
 class FullTextFromCSV:
@@ -18,7 +19,7 @@ class FullTextFromCSV:
         ['INT', 'INT', 'INT']
     ]
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: List[Any]) -> None:
         self.arguments = self.get_arguments(kwargs)
         if self.arguments['use_existing_db'] and os.path.isfile(self.arguments['database']) or \
                 not self.arguments['use_existing_db'] and not os.path.isfile(self.arguments['database']):
@@ -35,7 +36,7 @@ class FullTextFromCSV:
         self.fill_tables()
 
     @staticmethod
-    def get_arguments(kwargs):
+    def get_arguments(kwargs: Any) -> None:
         arguments = {
             'database': None,
             'use_existing_db': False,
@@ -56,7 +57,7 @@ class FullTextFromCSV:
             raise IOError('database path needs to be provided')
         return arguments
 
-    def create_tables(self):
+    def create_tables(self) -> None:
         column_names = [
             self.arguments['columns_names_docs'],
             self.arguments['columns_names_term_dict'],
@@ -67,7 +68,7 @@ class FullTextFromCSV:
             _create_table(self.connection, table_name, c_names, c_types)
         self.connection.commit()
 
-    def fill_tables(self):
+    def fill_tables(self) -> None:
         file_names = [
             self.arguments['docs_file'],
             self.arguments['term_dict_file'],

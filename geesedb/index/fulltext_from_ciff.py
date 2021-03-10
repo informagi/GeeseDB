@@ -3,6 +3,7 @@
 import argparse
 import gzip
 import os
+from typing import Any, List, Union, Tuple
 
 from ..connection import DBConnection
 from ..utils import CommonIndexFileFormat_pb2 as Ciff
@@ -22,7 +23,7 @@ class FullTextFromCiff:
         ['INT', 'INT', 'INT']
     ]
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: List[Any]) -> None:
         self.arguments = self.get_arguments(kwargs)
         if self.arguments['use_existing_db'] and os.path.isfile(self.arguments['database']) or \
                 not self.arguments['use_existing_db'] and not os.path.isfile(self.arguments['database']):
@@ -40,7 +41,7 @@ class FullTextFromCiff:
         self.fill_tables()
 
     @staticmethod
-    def get_arguments(kwargs):
+    def get_arguments(kwargs: Any) -> dict:
         arguments = {
             'database': None,
             'use_existing_db': False,
@@ -60,7 +61,7 @@ class FullTextFromCiff:
             raise IOError('protobuf file needs to be provided')
         return arguments
 
-    def create_tables(self):
+    def create_tables(self) -> None:
         column_names = [
             self.arguments['columns_names_docs'],
             self.arguments['columns_names_term_dict'],
@@ -71,7 +72,7 @@ class FullTextFromCiff:
             self.create_table(table_name, c_names, c_types)
         self.connection.commit()
 
-    def create_table(self, table_name, column_names, column_types):
+    def create_table(self, table_name: str, column_names: List[str], column_types: List[str]) -> None:
         try:
             self.cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
             self.connection.rollback()
@@ -82,7 +83,7 @@ class FullTextFromCiff:
         self.cursor.execute(query)
 
     @staticmethod
-    def decode(buffer, pos):
+    def decode(buffer: Union[str, bytes], pos: int) -> Union[Tuple[int, int], None]:
         mask = (1 << 32) - 1
         result = 0
         shift = 0
@@ -98,7 +99,7 @@ class FullTextFromCiff:
             if shift >= 64:
                 raise IOError('Too many bytes when decoding.')
 
-    def fill_tables(self):
+    def fill_tables(self) -> None:
         if self.arguments['protobuf_file'].endswith('.gz'):
             with gzip.open(self.arguments['protobuf_file'], 'rb') as f:
                 data = f.read()

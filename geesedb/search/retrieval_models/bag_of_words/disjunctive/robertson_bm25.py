@@ -2,18 +2,18 @@ from .disjunctive_retieval_model import DisjunctiveRetrievalModel
 
 
 class RobertsonBM25(DisjunctiveRetrievalModel):
-    def __init__(self, k1=0.9, b=0.4):
+    def __init__(self, k1: int = 0.9, b: int = 0.4) -> None:
         DisjunctiveRetrievalModel.__init__(self)
         self.k1 = k1
         self.b = b
 
-    def construct_query(self, topic):
+    def construct_query(self, topic: str) -> str:
         return DisjunctiveRetrievalModel.construct_query(self, topic) + \
                self.get_retrieval_model() + \
                DisjunctiveRetrievalModel.get_aggregator(self) + \
                DisjunctiveRetrievalModel.get_create_ranked_list(self)
 
-    def get_retrieval_model(self):
+    def get_retrieval_model(self) -> str:
         return ", subscores AS (" \
                "SELECT docs.collection_id, " \
                f"(LOG(((SELECT count(*) from docs)-df+0.5)/(df+0.5))*tf" \
@@ -25,4 +25,3 @@ class RobertsonBM25(DisjunctiveRetrievalModel):
                "ON qterms.doc_id = condocs.doc_id " \
                "JOIN docs " \
                "ON qterms.doc_id = docs.doc_id)"
-

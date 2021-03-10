@@ -3,7 +3,7 @@ from os import path
 from ...index import AuthorsFromCSV
 
 
-def test_load_csv_example_files():
+def test_load_csv_example_files() -> None:
     index = AuthorsFromCSV(database=':memory:',
                            author_doc_file=path.dirname(
                                path.dirname(__file__)) + '/resources/csv/example_author_doc.csv'

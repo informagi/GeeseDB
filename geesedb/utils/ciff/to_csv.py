@@ -2,6 +2,7 @@
 
 import argparse
 import gzip
+from typing import Union, Any, Tuple, List
 
 from . import CommonIndexFileFormat_pb2 as Ciff
 
@@ -14,12 +15,12 @@ class ToCSV:
     The files are created from a CIFF as described in:
     - https://arxiv.org/abs/2003.08276
     """
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: List[Any]) -> None:
         self.arguments = self.get_arguments(kwargs)
         self.create_csv_files()
 
     @staticmethod
-    def get_arguments(kwargs):
+    def get_arguments(kwargs: Any) -> dict:
         arguments = {
             'protobuf_file': None,
             'output_docs': 'docs.csv',
@@ -32,7 +33,7 @@ class ToCSV:
         return arguments
 
     @staticmethod
-    def decode(buffer, pos):
+    def decode(buffer: Union[str, bytes], pos: int) -> Union[Tuple[int, int], None]:
         mask = (1 << 32) - 1
         result = 0
         shift = 0
@@ -48,7 +49,7 @@ class ToCSV:
             if shift >= 64:
                 raise IOError('Too many bytes when decoding.')
 
-    def create_csv_files(self):
+    def create_csv_files(self) -> None:
         if self.arguments['protobuf_file'].endswith('.gz'):
             with gzip.open(self.arguments['protobuf_file'], 'rb') as f:
                 data = f.read()

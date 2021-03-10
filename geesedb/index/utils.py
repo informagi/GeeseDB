@@ -1,4 +1,10 @@
-def _create_table(connection, table_name, column_names, column_types):
+from typing import List
+
+from duckdb import DuckDBPyConnection
+
+
+def _create_table(connection: DuckDBPyConnection, table_name: str, column_names: List[str],
+                  column_types: List[str]) -> None:
     cursor = connection.cursor()
     try:
         cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
@@ -10,7 +16,8 @@ def _create_table(connection, table_name, column_names, column_types):
     cursor.execute(query)
 
 
-def _fill_empty_table_with_csv(connection, table_name, file_name, delimiter="|"):
+def _fill_empty_table_with_csv(connection: DuckDBPyConnection, table_name: str, file_name: str,
+                               delimiter: str = "|") -> None:
     cursor = connection.cursor()
     cursor.execute(f'SELECT COUNT(*) FROM {table_name};')
     if cursor.fetchone()[0] > 0:

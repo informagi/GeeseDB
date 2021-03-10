@@ -1,8 +1,9 @@
 import argparse
 import os
+from typing import Any, List
 
-from ..connection import DBConnection
 from .utils import _create_table, _fill_empty_table_with_csv
+from ..connection import DBConnection
 
 
 class AuthorsFromCSV:
@@ -12,7 +13,7 @@ class AuthorsFromCSV:
     """
     _COLUMN_TYPES = ['STRING', 'STRING']
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: List[Any]) -> None:
         self.arguments = self.get_arguments(kwargs)
         if self.arguments['use_existing_db'] and os.path.isfile(self.arguments['database']) or \
                 not self.arguments['use_existing_db'] and not os.path.isfile(self.arguments['database']):
@@ -31,7 +32,7 @@ class AuthorsFromCSV:
                                    self.arguments['delimiter'])
 
     @staticmethod
-    def get_arguments(kwargs):
+    def get_arguments(kwargs: Any) -> dict:
         arguments = {
             'database': None,
             'use_existing_db': False,

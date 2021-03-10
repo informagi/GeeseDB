@@ -3,7 +3,7 @@ from os import path
 from ...index import FullTextFromCiff
 
 
-def test_load_csv_example_files():
+def test_load_csv_example_files() -> None:
     index = FullTextFromCiff(database=':memory:',
                              protobuf_file=path.dirname(path.dirname(__file__)
                                                         ) + '/resources/ciff/toy-complete-20200309.ciff.gz'

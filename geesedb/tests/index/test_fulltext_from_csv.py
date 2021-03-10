@@ -3,7 +3,7 @@ from os import path
 from ...index import FullTextFromCSV
 
 
-def test_load_csv_example_files():
+def test_load_csv_example_files() -> None:
     index = FullTextFromCSV(database=':memory:',
                             docs_file=path.dirname(path.dirname(__file__)) + '/resources/csv/example_docs.csv',
                             term_dict_file=path.dirname(
@@ -15,7 +15,7 @@ def test_load_csv_example_files():
     assert index.connection.fetchone() == ('document_1', 1, 4)
 
 
-def test_load_csv_use_existing_database_does_not_exist():
+def test_load_csv_use_existing_database_does_not_exist() -> None:
     try:
         FullTextFromCSV(database='test_database',
                         use_existing_db=True
