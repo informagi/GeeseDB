@@ -10,11 +10,11 @@ from .utils import _fill_empty_table_with_csv, _create_table
 class EntitiesFromCSV:
     """
     Class for creating table from csv file that contains entities linked to doc
-    Offset - Length - Mention - Entity - Confidence ED - Confidence MD - NER Tag - Doc ID
+    Offset - Length - Mention - Entity - NER Tag - Doc ID
 
     Entities contain info as provided by REL: https://arxiv.org/abs/2006.01969
     """
-    _COLUMN_TYPES = ['INT', 'INT', 'STRING', 'STRING', 'DOUBLE', 'DOUBLE', 'STRING', 'STRING']
+    _COLUMN_TYPES = ['INT', 'INT', 'STRING', 'STRING', 'STRING', 'STRING']
 
     def __init__(self, **kwargs):
         self.arguments = self.get_arguments(kwargs)
@@ -42,7 +42,7 @@ class EntitiesFromCSV:
             'use_existing_tables': False,
             'entity_doc_file': 'entity_doc.csv',
             'table_name': 'entity_doc',
-            'columns_names': ['start', 'len', 'mention', 'entity', 'conf_ed', 'conf_md', 'ner_tag', 'doc_id'],
+            'columns_names': ['start', 'len', 'mention', 'entity', 'ner_tag', 'doc_id'],
             'delimiter': '|'
         }
         for key, item in arguments.items():
@@ -83,7 +83,7 @@ if __name__ == '__main__':
                         metavar='[string]',
                         nargs=8,
                         help='Column names for the doc-entity table. If not provided the default: '
-                             "['start', 'len', 'mention', 'entity', 'conf_ed', 'conf_md', 'ner_tag', 'doc_id'] "
+                             "['start', 'len', 'mention', 'entity', 'ner_tag', 'doc_id'] "
                              "will be used.")
     parser.add_argument('-e',
                         '--delimiter',
