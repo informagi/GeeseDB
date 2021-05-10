@@ -36,7 +36,7 @@ class FullTextFromCSV:
         self.fill_tables()
 
     @staticmethod
-    def get_arguments(kwargs: Any) -> None:
+    def get_arguments(kwargs: Any) -> dict:
         arguments = {
             'database': None,
             'use_existing_db': False,
