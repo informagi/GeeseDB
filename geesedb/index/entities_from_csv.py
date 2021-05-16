@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from typing import Any, List
+from typing import Any
 
 from .utils import _fill_empty_table_with_csv, _create_table
 from ..connection import DBConnection
@@ -17,7 +17,7 @@ class EntitiesFromCSV:
     """
     _COLUMN_TYPES = ['INT', 'INT', 'STRING', 'STRING', 'STRING', 'STRING']
 
-    def __init__(self, **kwargs: List[Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
         if self.arguments['use_existing_db'] and os.path.isfile(self.arguments['database']) or \
                 not self.arguments['use_existing_db'] and not os.path.isfile(self.arguments['database']):

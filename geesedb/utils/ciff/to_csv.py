@@ -2,7 +2,7 @@
 
 import argparse
 import gzip
-from typing import Union, Any, Tuple, List
+from typing import Union, Any, Tuple
 
 from . import CommonIndexFileFormat_pb2 as Ciff
 
@@ -15,7 +15,7 @@ class ToCSV:
     The files are created from a CIFF as described in:
     - https://arxiv.org/abs/2003.08276
     """
-    def __init__(self, **kwargs: List[Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
         self.create_csv_files()
 

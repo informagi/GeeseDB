@@ -1,12 +1,12 @@
 import cmd, argparse
-from typing import Any, List
+from typing import Any
 from ..connection import DBConnection
 
 class SQL(cmd.Cmd):
     intro = 'SQL shell powered by DuckDB. Type help or ? to list commands.\n'
     prompt = '(sql) '
 
-    def __init__(self, **kwargs: List[Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
         self.db_connection = DBConnection(self.arguments['database'])
         self.cursor = self.db_connection.cursor

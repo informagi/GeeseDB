@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import argparse
-from typing import Any, Callable, List, Union
+from typing import Any, Callable, Union
 
 import numpy as np
 import pandas as pd
@@ -12,7 +12,7 @@ from ..search import RobertsonBM25
 
 class Searcher:
 
-    def __init__(self, **kwargs: List[Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
         self.db_connection = DBConnection(self.arguments['database'])
         self.ranking_method = None

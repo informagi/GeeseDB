@@ -23,7 +23,7 @@ class FullTextFromCiff:
         ['INT', 'INT', 'INT']
     ]
 
-    def __init__(self, **kwargs: List[Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
         if self.arguments['use_existing_db'] and os.path.isfile(self.arguments['database']) or \
                 not self.arguments['use_existing_db'] and not os.path.isfile(self.arguments['database']):
