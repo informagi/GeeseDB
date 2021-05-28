@@ -15,7 +15,7 @@ class FullTextFromCSV:
     """
     _COLUMN_TYPES = [
         ['STRING', 'INT', 'INT'],
-        ['INT', 'INT', 'STRING'],
+        ['INT', 'STRING', 'INT'],
         ['INT', 'INT', 'INT']
     ]
 
@@ -43,7 +43,7 @@ class FullTextFromCSV:
             'use_existing_tables': False,
             'table_names': ['docs', 'term_dict', 'term_doc'],
             'columns_names_docs': ['collection_id', 'doc_id', 'len'],
-            'columns_names_term_dict': ['term_id', 'df', 'string'],
+            'columns_names_term_dict': ['term_id', 'string', 'df'],
             'columns_names_term_doc': ['term_id', 'doc_id', 'tf'],
             'docs_file': 'docs.csv',
             'term_dict_file': 'dict.csv',

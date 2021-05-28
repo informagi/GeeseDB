@@ -28,7 +28,7 @@ class AuthorsFromCSV:
         if not self.arguments['use_existing_tables']:
             _create_table(self.connection, self.arguments['table_name'], self.arguments['columns_names'],
                           self._COLUMN_TYPES)
-        _fill_empty_table_with_csv(self. connection, self.arguments['table_name'], self.arguments['author_doc_file'],
+        _fill_empty_table_with_csv(self.connection, self.arguments['table_name'], self.arguments['doc_author_file'],
                                    self.arguments['delimiter'])
 
     @staticmethod
@@ -37,9 +37,9 @@ class AuthorsFromCSV:
             'database': None,
             'use_existing_db': False,
             'use_existing_tables': False,
-            'author_doc_file': 'author_doc.csv',
-            'table_name': 'author_doc',
-            'columns_names': ['author', 'doc'],
+            'doc_author_file': 'doc_author.csv',
+            'table_name': 'doc_author',
+            'columns_names': ['doc', 'author'],
             'delimiter': '|'
         }
         for key, item in arguments.items():
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                         action='store_true',
                         help='Use existing tables.')
     parser.add_argument('-a',
-                        '--author_doc_file',
+                        '--doc_author_file',
                         metavar='[file]',
                         help='Filename for the csv file containing the data for the docs table.')
     parser.add_argument('-t',

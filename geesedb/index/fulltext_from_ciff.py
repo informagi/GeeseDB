@@ -36,7 +36,7 @@ class FullTextFromCiff:
         self.connection = db_connection.connection
         self.cursor = db_connection.cursor
 
-        if not self.arguments['use_existing_db']:
+        if not self.arguments['use_existing_tables']:
             self.create_tables()
         self.fill_tables()
 
