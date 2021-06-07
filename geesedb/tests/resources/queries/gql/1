@@ -1,0 +1,2 @@
+MATCH (d:docs {collection_id:"96ab542e-6a07-11e6-ba32-5a4bf5aad4fa"})-[]-(:authors)-[]-(:docs)-[]-(a:authors)
+RETURN DISTINCT a.author

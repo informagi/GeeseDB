@@ -1,0 +1,2 @@
+MATCH (a:authors)
+RETURN a.author

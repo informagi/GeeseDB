@@ -1,0 +1,9 @@
+SELECT distinct a.author
+FROM authors AS a
+JOIN doc_author AS da ON (a.author = da.author)
+JOIN docs AS d0 ON (d0.collection_id = da.doc)
+JOIN doc_author as da2 ON (d0.collection_id = da2.doc)
+JOIN authors as a2 ON (da2.author = a2.author)
+JOIN doc_author as da3 ON (a2.author = da3.author)
+JOIN docs as d ON (d.collection_id = da3.doc)
+WHERE d.collection_id = '96ab542e-6a07-11e6-ba32-5a4bf5aad4fa'

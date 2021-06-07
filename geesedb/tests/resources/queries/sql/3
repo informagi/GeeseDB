@@ -1,0 +1,12 @@
+WITH SELECT count(*) FROM docs AS n,
+SELECT en.entity, en.tf * log(n) / entities.df) AS tfidf
+FROM
+    (SELECT entity, count(*) AS tf
+     FROM entity_doc
+     WHERE doc_id = '96ab542e-6a07-11e6-ba32-5a4bf5aad4fa'
+     GROUP BY entity
+     ) AS en
+JOIN entities
+ON (entities.entity = en.entity)
+ORDER BY tfidf DESC
+LIMIT 5;

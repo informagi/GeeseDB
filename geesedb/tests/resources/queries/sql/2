@@ -1,0 +1,2 @@
+SELECT a.author
+FROM authors as a
