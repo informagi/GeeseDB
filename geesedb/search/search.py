@@ -6,7 +6,7 @@ from typing import Any, Callable, Union
 import numpy as np
 import pandas as pd
 
-from ..connection import DBConnection
+from ..connection import get_connection
 from ..search import RobertsonBM25
 
 
@@ -14,7 +14,7 @@ class Searcher:
 
     def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
-        self.db_connection = DBConnection(self.arguments['database'])
+        self.db_connection = get_connection(self.arguments['database'])
         self.ranking_method = None
         self.fetch = self.set_return_type()
         if self.arguments['retrieval_method'] == 'BM25_robertson':

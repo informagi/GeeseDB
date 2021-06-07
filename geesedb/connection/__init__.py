@@ -1,3 +1,3 @@
-from .connection import DBConnection
+from .connection import get_connection, close_connection
 
-__all__ = ['DBConnection']
+__all__ = ['get_connection', 'close_connection']

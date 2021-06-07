@@ -1,6 +1,6 @@
 import cmd, argparse
 from typing import Any
-from ..connection import DBConnection
+from ..connection import get_connection
 
 class SQL(cmd.Cmd):
     intro = 'SQL shell powered by DuckDB. Type help or ? to list commands.\n'
@@ -8,7 +8,7 @@ class SQL(cmd.Cmd):
 
     def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
-        self.db_connection = DBConnection(self.arguments['database'])
+        self.db_connection = get_connection(self.arguments['database'])
         self.cursor = self.db_connection.cursor
         super(SQL, self).__init__()
 

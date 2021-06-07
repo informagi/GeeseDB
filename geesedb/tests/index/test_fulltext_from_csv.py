@@ -1,7 +1,7 @@
 from os import path
 
 from ...index import FullTextFromCSV
-
+from ...connection import close_connection
 
 def test_load_csv_example_files() -> None:
     index = FullTextFromCSV(database=':memory:',
@@ -13,6 +13,7 @@ def test_load_csv_example_files() -> None:
     index.connection.execute("SELECT * FROM docs;")
     assert index.connection.fetchone() == ('document_0', 0, 3)
     assert index.connection.fetchone() == ('document_1', 1, 4)
+    close_connection()
 
 
 def test_load_csv_use_existing_database_does_not_exist() -> None:
@@ -23,3 +24,4 @@ def test_load_csv_use_existing_database_does_not_exist() -> None:
         assert False
     except IOError:
         assert True
+    close_connection()

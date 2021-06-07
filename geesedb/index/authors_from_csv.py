@@ -3,7 +3,7 @@ import os
 from typing import Any
 
 from .utils import _create_table, _fill_empty_table_with_csv
-from ..connection import DBConnection
+from ..connection import get_connection
 
 
 class AuthorsFromCSV:
@@ -22,7 +22,7 @@ class AuthorsFromCSV:
             raise IOError('There already exist a file on this path.')
         else:
             raise IOError('Database does not exist.')
-        db_connection = DBConnection(self.arguments['database'])
+        db_connection = get_connection(self.arguments['database'])
         self.connection = db_connection.connection
 
         if not self.arguments['use_existing_tables']:

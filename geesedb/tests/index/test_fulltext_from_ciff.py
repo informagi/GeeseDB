@@ -1,7 +1,7 @@
 from os import path
 
 from ...index import FullTextFromCiff
-
+from ...connection import close_connection
 
 def test_load_csv_example_files() -> None:
     index = FullTextFromCiff(database=':memory:',
@@ -11,3 +11,4 @@ def test_load_csv_example_files() -> None:
     index.cursor.execute("SELECT * FROM docs;")
     assert index.cursor.fetchone() == ('WSJ_1', 0, 6)
     assert index.cursor.fetchone() == ('TREC_DOC_1', 1, 4)
+    close_connection()

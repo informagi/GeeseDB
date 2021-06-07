@@ -5,7 +5,7 @@ import gzip
 import os
 from typing import Any, List, Union, Tuple
 
-from ..connection import DBConnection
+from ..connection import get_connection
 from ..utils import CommonIndexFileFormat_pb2 as Ciff
 
 
@@ -32,7 +32,7 @@ class FullTextFromCiff:
             raise IOError('There already exist a file on this path.')
         else:
             raise IOError('Database does not exist.')
-        db_connection = DBConnection(self.arguments['database'])
+        db_connection = get_connection(self.arguments['database'])
         self.connection = db_connection.connection
         self.cursor = db_connection.cursor
 
