@@ -21,8 +21,8 @@ class Translator:
         'variable_name_filter': re.compile('\W') # use to only keep letters + numbers
     }
 
-    def __init__(self):
-        self.metadata = Metadata()
+    def __init__(self, database):
+        self.metadata = Metadata(database)
 
     def translate(self, query):
         if self.patterns['match_return'].match(query):
