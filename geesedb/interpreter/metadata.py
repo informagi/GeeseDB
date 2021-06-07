@@ -5,7 +5,7 @@ from ..connection import get_connection
 class Metadata:
 
     def __init__(self, database):
-        self.connection = get_connection(database)
+        self.connection = get_connection(database).connection
 
     # first list is default if nothing is specified (should be extended)
     # list is ordered as [edge_name, node1_id, edge_node1_id, edge_node2_id, node2_id2

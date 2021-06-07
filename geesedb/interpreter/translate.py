@@ -1,6 +1,6 @@
 import re
 import base64
-from metadata import Metadata
+from .metadata import Metadata
 
 class Translator:
 
