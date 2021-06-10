@@ -1,6 +1,9 @@
-import cmd, argparse
+import argparse
+import cmd
 from typing import Any
+
 from ..connection import get_connection
+
 
 class SQL(cmd.Cmd):
     intro = 'SQL shell powered by DuckDB. Type help or ? to list commands.\n'
@@ -42,6 +45,7 @@ class SQL(cmd.Cmd):
             self.cursor.execute(line)
         except RuntimeError as error:
             print(error)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

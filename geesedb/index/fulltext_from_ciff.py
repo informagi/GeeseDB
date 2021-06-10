@@ -111,7 +111,7 @@ class FullTextFromCiff:
         next_pos, pos = 0, 0
         header = Ciff.Header()
         next_pos, pos = self.decode(data, pos)
-        header.ParseFromString(data[pos:pos+next_pos])
+        header.ParseFromString(data[pos:pos + next_pos])
         pos += next_pos
 
         # read posting lists
@@ -119,7 +119,7 @@ class FullTextFromCiff:
         for term_id in range(header.num_postings_lists):
             self.connection.begin()
             next_pos, pos = self.decode(data, pos)
-            postings_list.ParseFromString(data[pos:pos+next_pos])
+            postings_list.ParseFromString(data[pos:pos + next_pos])
             pos += next_pos
             q = f'INSERT INTO {self.arguments["table_names"][1]} ' \
                 f'({",".join(self.arguments["columns_names_term_dict"])}) ' \
@@ -143,7 +143,7 @@ class FullTextFromCiff:
                 self.connection.commit()
                 self.connection.begin()
             next_pos, pos = self.decode(data, pos)
-            doc_record.ParseFromString(data[pos:pos+next_pos])
+            doc_record.ParseFromString(data[pos:pos + next_pos])
             pos += next_pos
             q = f'INSERT INTO {self.arguments["table_names"][0]} ' \
                 f'({",".join(self.arguments["columns_names_docs"])}) ' \

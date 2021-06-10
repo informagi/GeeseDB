@@ -2,6 +2,7 @@ import json
 
 from ..connection import get_connection
 
+
 class Metadata:
 
     def __init__(self, database):

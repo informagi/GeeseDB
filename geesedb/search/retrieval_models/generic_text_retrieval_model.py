@@ -12,4 +12,3 @@ class GenericTextRetrievalModel:
 
     def get_retrieval_model(self) -> str:
         raise NotImplementedError("You should implement this method in your retrieval model class.")
-

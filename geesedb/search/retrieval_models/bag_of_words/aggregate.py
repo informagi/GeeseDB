@@ -8,4 +8,3 @@ class Aggregate:
 
     def get_create_ranked_list(self) -> str:
         raise NotImplementedError("You should implement this method in your retrieval model class.")
-

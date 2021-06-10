@@ -2,23 +2,25 @@ import re
 import base64
 from .metadata import Metadata
 
-class Translator:
 
+class Translator:
     patterns = {
         # match return
-        'match_return': re.compile('MATCH +(\(.*\)) +(WHERE *(?:.*)(?: *AND *(?:.*))* +)?(RETURN .*)', re.IGNORECASE),  # basic match return
+        'match_return': re.compile('MATCH +(\(.*\)) +(WHERE *(?:.*)(?: *AND *(?:.*))* +)?(RETURN .*)',
+                                   re.IGNORECASE),  # basic match return
 
         # return patterns
-        'split_return': re.compile('RETURN((?: +DISTINCT)? +[^ ]*) *(ORDER +BY +[^ ]*(?: +(?:DESC)?(?:ASC)?)?)? *(SKIP +[^ ]*)? *(LIMIT +[^ ]*)?', re.IGNORECASE),
+        'split_return': re.compile('RETURN((?: +DISTINCT)? +[^ ]*) *(ORDER +BY +[^ ]*(?: +(?:DESC)?(?:ASC)?)?)? '
+                                   '*(SKIP +[^ ]*)? *(LIMIT +[^ ]*)?', re.IGNORECASE),
 
         # match patterns
-        'match1': re.compile('\A\(([^()]*)\)'), # head section (first node)
-        'match2': re.compile('(-\[]-\([^()]*\))'), # tail section (edges + rest of nodes)
-        'split_ending': re.compile('-\[([^()]*)]-\((.*)\)'), # split edge and to_connect node
-        'extract_filters': re.compile('\A([^{}]*){(.*)}\Z'), # extract filter from node / edge
+        'match1': re.compile('\A\(([^()]*)\)'),  # head section (first node)
+        'match2': re.compile('(-\[]-\([^()]*\))'),  # tail section (edges + rest of nodes)
+        'split_ending': re.compile('-\[([^()]*)]-\((.*)\)'),  # split edge and to_connect node
+        'extract_filters': re.compile('\A([^{}]*){(.*)}\Z'),  # extract filter from node / edge
 
         # only chars and numbers
-        'variable_name_filter': re.compile('\W') # use to only keep letters + numbers
+        'variable_name_filter': re.compile('\W')  # use to only keep letters + numbers
     }
 
     def __init__(self, database):
@@ -28,17 +30,18 @@ class Translator:
         if self.patterns['match_return'].match(query):
             regex_match = self.patterns['match_return'].match(query)
             _match, _filters, _return = regex_match.groups()
-            sql_query = self.construct_sql_match_return(_match, _filters, _return)
+            sql_query = self.construct_sql_match_filter_return(_match, _filters, _return)
         else:
             raise
         return sql_query
 
-    def construct_sql_match_return(self, _match, _filters, _return):
+    def construct_sql_match_filter_return(self, _match, _filters, _return):
         head, tail = self.split_return(_return)
         sql_query = f'SELECT {head.strip()} '
         joins, extra_filters = self.process_match(_match)
         filters = self.process_filters(_filters, extra_filters)
-        out = (((f'{sql_query.strip().strip()}' + f' {joins.strip()}').strip() + f' {filters.strip()}').strip() + f' {tail.strip()}').strip()
+        out = (((f'{sql_query.strip().strip()}' + f' {joins.strip()}').strip() + f' {filters.strip()}').strip()
+               + f' {tail.strip()}').strip()
         return out
 
     def split_return(self, _return):
@@ -58,12 +61,13 @@ class Translator:
     def build_joins(self, nodes, edges):
         joins = ''
         joins += f'FROM {nodes[0][1]} AS {nodes[0][0]} '
-        for i in range(len(nodes)-1):
+        for i in range(len(nodes) - 1):
             node1 = nodes[i]
             edge = edges[i]
-            node2 = nodes[i+1]
+            node2 = nodes[i + 1]
             meta = self.metadata.get_default_join_info(node1[1], node2[1])
-            joins += f'JOIN {edge[1]} AS {edge[0]} ON ({node1[0]}.{meta[1]} = {edge[0]}.{meta[2]}) JOIN {node2[1]} AS {node2[0]} ON ({edge[0]}.{meta[3]} = {node2[0]}.{meta[4]}) '
+            joins += f'JOIN {edge[1]} AS {edge[0]} ON ({node1[0]}.{meta[1]} = {edge[0]}.{meta[2]}) JOIN {node2[1]}' \
+                     f' AS {node2[0]} ON ({edge[0]}.{meta[3]} = {node2[0]}.{meta[4]}) '
         return joins.strip()
 
     def process_filters(self, filters, extra_filters):
@@ -80,7 +84,6 @@ class Translator:
         else:
             f = ''
         return f
-
 
     def process_match(self, _match):
         beginning_match = self.patterns['match1'].match(_match)
@@ -122,7 +125,7 @@ class Translator:
                 head = tail = ''
             if tail == '':
                 before_node = processed_nodes[i][1]
-                after_node = processed_nodes[i+1][1]
+                after_node = processed_nodes[i + 1][1]
                 tail = self.metadata.get_default_join_info(before_node, after_node)[0]
             if head == '':
                 head = self.create_variable_name(tail, i)

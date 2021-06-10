@@ -1,7 +1,10 @@
-import cmd, argparse
+import argparse
+import cmd
 from typing import Any
+
 from ..connection import get_connection
 from ..interpreter import Translator
+
 
 class GQL(cmd.Cmd):
     intro = 'GQL shell powered by DuckDB and to SQL translations. Type help or ? to list commands.\n'
@@ -44,6 +47,7 @@ class GQL(cmd.Cmd):
             self.cursor.execute(self.translator.translate(line))
         except RuntimeError as error:
             print(error)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
