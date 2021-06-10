@@ -25,8 +25,8 @@ class BagOfWordsRetrievalModel(GenericTextRetrievalModel, Aggregate):
                "FROM subscores " \
                "GROUP BY subscores.collection_id) "
 
-    def get_create_ranked_list(self) -> str:
+    def get_create_ranked_list(self, n: int) -> str:
         return "SELECT scores.collection_id, scores.score " \
                "FROM scores " \
                "ORDER BY scores.score DESC " \
-               "LIMIT 1000"
+               f"LIMIT {n}"

@@ -6,5 +6,5 @@ class Aggregate:
     def get_aggregator(self) -> str:
         raise NotImplementedError("You should implement this method in your retrieval model class.")
 
-    def get_create_ranked_list(self) -> str:
+    def get_create_ranked_list(self, n: int) -> str:
         raise NotImplementedError("You should implement this method in your retrieval model class.")
