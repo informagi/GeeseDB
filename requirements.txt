@@ -1,4 +1,4 @@
-duckdb>=0.1.3
+duckdb
 google>=2
 protobuf>=3
 numpy
