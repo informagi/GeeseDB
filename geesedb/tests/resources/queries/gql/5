@@ -1,0 +1,5 @@
+MATCH (d:docs {collection_id: ?})-[]-(t:term_dict)
+RETURN string
+ORDER BY tf*log(671945/df)
+DESC
+LIMIT 5
