@@ -72,15 +72,19 @@ class Translator:
 
     def process_filters(self, filters, extra_filters):
         if filters is not None:
-            f = filters
+            f = filters.replace('"', "'")
             for e in extra_filters:
-                f += f' AND {e[0]} = {e[1]}'
+                pre, post = e
+                post = post.replace('"', "'")
+                f += f' AND {pre} = {post}'
         elif len(extra_filters) > 0:
             pre, post = extra_filters[0]
             post = post.replace('"', "'")
             f = f'WHERE {pre} = {post}'
             for e in extra_filters[1:]:
-                f += f' AND {e[0]} = {e[1]}'
+                pre, post = e
+                post = post.replace('"', "'")
+                f += f' AND {pre} = {post}'
         else:
             f = ''
         return f
