@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='geesedb',
@@ -6,7 +6,7 @@ setup(
     description='Graph Engine for Exploration and Search over Evolving DataBases',
     author='Chris Kamphuis',
     author_email='chris@cs.ru.nl',
-    packages=['geesedb'],
     url='https://github.com/informagi/GeeseDB',
     install_requires=['duckdb'],
+    packages=find_packages()
 )

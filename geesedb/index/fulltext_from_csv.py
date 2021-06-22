@@ -31,6 +31,8 @@ class FullTextFromCSV:
         db_connection = get_connection(self.arguments['database'])
         self.connection = db_connection.connection
 
+
+    def load_data(self):
         if not self.arguments['use_existing_db']:
             self.create_tables()
         self.fill_tables()
