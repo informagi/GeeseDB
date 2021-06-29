@@ -27,6 +27,7 @@ class Translator:
         self.metadata = Metadata(database)
 
     def translate(self, query):
+        query = query.replace('\n', ' ').strip()
         if self.patterns['match_return'].match(query):
             regex_match = self.patterns['match_return'].match(query)
             _match, _filters, _return = regex_match.groups()
