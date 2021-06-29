@@ -10,5 +10,6 @@ setup(
     install_requires=['duckdb', 'numpy', 'pandas'],
     packages=find_packages(),
     include_package_data=True,
-    package_data={'': ['qrels.*', 'topics.*']}
+    package_data={'': ['qrels.*', 'topics.*']},
+    license='MIT License'
 )
