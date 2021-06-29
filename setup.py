@@ -7,6 +7,8 @@ setup(
     author='Chris Kamphuis',
     author_email='chris@cs.ru.nl',
     url='https://github.com/informagi/GeeseDB',
-    install_requires=['duckdb'],
-    packages=find_packages()
+    install_requires=['duckdb', 'numpy', 'pandas'],
+    packages=find_packages(),
+    include_package_data=True,
+    package_data={'': ['qrels.*', 'topics.*']}
 )
