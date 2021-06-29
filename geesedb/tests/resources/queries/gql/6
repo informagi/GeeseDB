@@ -1,1 +1,4 @@
-MATCH (d:docs)-[]-(:authors)-[]-(:docs)-[]-(:authors)-[]-(d2:docs {collection_id:"96ab542e-6a07-11e6-ba32-5a4bf5aad4fa"}) RETURN DISTINCT d.collection_id
+MATCH (d:docs {collection_id: "96ab542e-6a07-11e6-ba32-5a4bf5aad4fa"})-[]-(e:entities)
+RETURN mention
+ORDER BY start
+LIMIT 5
