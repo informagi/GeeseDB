@@ -1,5 +1,7 @@
 # GeeseDB
-Graph Engine for Exploration and Search
+[![Build Status](https://app.travis-ci.com/informagi/GeeseDB.svg?branch=master)](https://app.travis-ci.com/informagi/GeeseDB)
+
+## Graph Engine for Exploration and Search
 
 GeeseDB is a Python toolkit for solving information retrieval research problems that leverage graphs as data structures. It aims to simplify information retrieval research by allowing researchers to easily formulate graph queries through a graph query language. GeeseDB is built on top of [DuckDB](http://duckdb.org/), an embedded column-store relational database designed for analytical workloads.
 
