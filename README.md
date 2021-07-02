@@ -46,3 +46,19 @@ index = FullTextFromCSV(
 )
 index.load_data()
 ```
+
+## How do I search?
+
+After indexing in the data, it is really easy to construct a first stage ranking using BM25:
+
+```python3
+from geesedb.search import Searcher
+
+searcher = Searcher(
+    database='/path/to/database', 
+    n=10
+)
+hits = searcher.search_topic('cat')
+```
+
+In this case the searcher returns the top 10 queries for the term `cat`. 
