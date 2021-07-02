@@ -61,4 +61,4 @@ searcher = Searcher(
 hits = searcher.search_topic('cat')
 ```
 
-In this case the searcher returns the top 10 queries for the term `cat`. 
+In this case the searcher returns the top 10 documents for the query: `cat`. 
