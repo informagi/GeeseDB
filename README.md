@@ -28,3 +28,39 @@ You can run our tests to confirm if everything is working as intended (in the re
 ```
 pytest
 ```
+
+## How do I index?
+
+The fastest way to load text data into GeeseDB is through CSV files. There should be three csv files: one for terms, one for documents, and one that connects the terms to the documents. A small example of these file is show below:
+
+- `docs.csv` (collection_id, doc_id, len): 
+```
+document_0|0|3
+document_1|1|4
+```
+- `terms_dict.csv` (term_id, string, df):
+```
+0|0|2
+1|Hello|2
+```
+- `term_doc.csv` (term_id, doc_id, tf):
+```
+0|0|1
+0|1|1
+1|0|2
+1|1|3
+```
+
+These can be generated using the CIFF to_csv class from [CIFF](https://github.com/osirrc/ciff) collections, or you can create them however you like. The documents can be loaded using the following code:
+
+```python3
+from geesedb.index import FullTextFromCSV
+
+index = FullTextFromCSV(
+    database='/path/to/database',
+    docs_file='path/to/docs.csv',
+    term_dict_file='/path/to/term_dict.csv',
+    term_doc_file='/path/to/term_doc.csv'
+)
+index.load_data()
+```
