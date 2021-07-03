@@ -2,13 +2,11 @@
 [![Build Status](https://app.travis-ci.com/informagi/GeeseDB.svg?branch=master)](https://app.travis-ci.com/informagi/GeeseDB)
 
 ## Graph Engine for Exploration and Search
-
 GeeseDB is a Python toolkit for solving information retrieval research problems that leverage graphs as data structures. It aims to simplify information retrieval research by allowing researchers to easily formulate graph queries through a graph query language. GeeseDB is built on top of [DuckDB](http://duckdb.org/), an embedded column-store relational database designed for analytical workloads.
 
 GeeseDB is available as an easy to install Python package. In only a few lines of code users can create a first stage retrieval ranking using BM25. Queries read and write Numpy arrays and Pandas dataframes, at zero or negligible data transformation cost (dependent on base datatype). Therefore, results of a first-stage ranker expressed in GeeseDB can be used in various stages in the ranking process, enabling all the power of Python machine learning libraries with minimal overhead. Also, because data representation and processing are strictly separated, GeeseDB forms an ideal basis for reproducible IR research.
 
 ## Package Installation
-
 Install latest version of GeeseDB via [PyPI](https://pypi.org/project/geesedb/):
 
 ```
@@ -32,7 +30,6 @@ pytest
 ```
 
 ## How do I index?
-
 The fastest way to load text data into GeeseDB is through CSV files. There should be three csv files: one for terms, one for documents, and one that connects the terms to the documents. Small examples of these files can be found in the repository: [docs.csv](./geesedb/tests/resources/csv/example_docs.csv), [terms_dics.csv](./geesedb/tests/resources/csv/example_term_dict.csv), and [term_doc.csv](./geesedb/tests/resources/csv/example_term_doc.csv).
 
 These can be generated using the CIFF [to_csv](./geesedb/utils/ciff/to_csv.py) class from [CIFF](https://github.com/osirrc/ciff) collections, or you can create them however you like. The documents can be loaded using the following code:
@@ -42,7 +39,7 @@ from geesedb.index import FullTextFromCSV
 
 index = FullTextFromCSV(
     database='/path/to/database',
-    docs_file='path/to/docs.csv',
+    docs_file='/path/to/docs.csv',
     term_dict_file='/path/to/term_dict.csv',
     term_doc_file='/path/to/term_doc.csv'
 )
@@ -50,7 +47,6 @@ index.load_data()
 ```
 
 ## How do I search?
-
 After indexing in the data, it is really easy to construct a first stage ranking using BM25:
 
 ```python3
@@ -64,3 +60,15 @@ hits = searcher.search_topic('cat')
 ```
 
 In this case the searcher returns the top 10 documents for the query: `cat`. 
+
+## How can I use SQL with GeeseDB?
+GeeseDB is built on top of [DuckDB](http://duckdb.org/), and we inherit all its functionalities. It is possible to directly query the data in GeeseDB using SQL. The following example shows an example on how to use SQL on the data loaded in the example above:
+
+```python3
+from geesedb.connection import get_connection
+
+db_path = '/path/to/database/'
+cursor = get_connection(db_path)
+cursor.execute("SELECT count(*) FROM docs;")
+cursor.fetchall()
+```
