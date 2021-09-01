@@ -3,3 +3,4 @@ google>=2
 protobuf>=3
 numpy
 pandas
+git+git://github.com/informagi/pycypher
