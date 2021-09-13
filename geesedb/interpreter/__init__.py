@@ -1,4 +1,5 @@
-from .translate import Translator
 from .metadata import Metadata
+from .parser import Parser
+from .translate import Translator
 
-__all__ = ['Translator', 'Metadata']
+__all__ = ['Parser', 'Translator', 'Metadata']
