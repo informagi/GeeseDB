@@ -21,6 +21,9 @@ class Metadata:
     def get_default_join_info(self, node1, node2):
         return self.get_metadata()[node1][node2][0]
 
+    def get_all_join_info(self, node1, node2):
+        return self.get_metadata()[node1][node2]
+
     # {
     #     'term_dict': {
     #         'docs': [['term_doc', 'term_id', 'term_id', 'doc_id', 'doc_id']]
