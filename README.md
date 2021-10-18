@@ -72,3 +72,53 @@ cursor = get_connection(db_path)
 cursor.execute("SELECT count(*) FROM docs;")
 cursor.fetchall()
 ```
+
+## How can I use Cypher with GeeseDB
+GeeseDB also supports a subset of the Cypher graph query language, in particular the following keywords: `MATCH`, `RETURN`, `WHERE`, `AND`, `DISTINCT`, `ORDER BY`, `SKIP`, and `LIMIT`. We plan to support the full Cypher query langauge in the future. In order to use the Cypher query language with GeeseDB, first a metadata file needs to be loaded. 
+
+The metadata represents the graph structure represented in the database, the table name `_meta` is used for this. The metadata is represented as a Python dictionary object with the following structure:
+```python
+{
+    'from_node':
+    {
+        'to_node':
+        {
+            [['join_table',
+              'from_node_join_key',
+              'join_table_from_node_join_key',
+              'join_table_to_node_join_key',
+              'to_node_join_key'
+              ]]
+        }
+    }
+}
+```
+Using this structure we know which tables in the database related to eachother. If this information is known it is possible to translate Cypher queries to SQL queries. An example of a Cypher query that can be translated to SQL is shown belows:
+
+Cypher:
+```cypher
+MATCH (d:docs)-[]-(:authors)-[]-(d2:docs)
+WHERE d.collection_id = "96ab542e"
+RETURN DISTINCT d2.collection_id
+```
+
+SQL:
+```sql
+SELECT DISTINCT d2.collection_id
+FROM docs AS d2
+JOIN doc_author AS da2 ON (d2.collection_id = da2.doc)
+JOIN authors AS a2 ON (da2.author = a2.author)
+JOIN doc_author AS da3 ON (a2.author = da3.author)
+JOIN docs AS d ON (d.collection_id = da3.doc)
+WHERE d.collection_id = '96ab542e'
+```
+
+The queries can be translated the following way:
+
+```python
+from geesedb.interpreter import Translator
+
+c_query = "cypher query"
+translator = Translator('path/to/database')
+sql_query = translator.translate(c_query)
+```
