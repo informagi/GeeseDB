@@ -382,8 +382,6 @@ class _ParseSingleQuery:
             return return_items
 
         elif name == 'Expression':
-            for r in result:
-                print(r)
             return self.process_node(result[0]['children'])
 
         elif name in {'OrExpression', 'AndExpression', 'XorExpression', 'NotExpression'}:
@@ -481,8 +479,6 @@ class _ParseSingleQuery:
         elif name == 'Atom':
             return_expression = ''
             for r in result:
-                print(f'Atom: {r}')
-                print()
                 if r['node'] == r['children']:
                     return_expression += r['node']['text']
                 else:
@@ -492,8 +488,6 @@ class _ParseSingleQuery:
         elif name == 'FunctionInvocation':
             return_expression = ''
             for r in result:
-                print(f'Function inv: {r}')
-                print()
                 if r['node'] == r['children']:
                     return_expression += r['node']['text']
                 elif r['children']['name'] == 'FunctionName':

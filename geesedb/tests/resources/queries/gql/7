@@ -1,0 +1,5 @@
+MATCH (n:Actor)
+RETURN n.name AS name
+UNION
+MATCH (n:Movie)
+RETURN n.title AS name
