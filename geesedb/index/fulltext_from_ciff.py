@@ -3,6 +3,7 @@
 import argparse
 import gzip
 import os
+import duckdb
 from typing import Any, List, Union, Tuple
 
 from ..connection import get_connection
@@ -78,7 +79,7 @@ class FullTextFromCiff:
             self.cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
             self.connection.rollback()
             raise IOError('Table already exists.')
-        except RuntimeError:  # If the table does not exists you get a RuntimeError
+        except duckdb.CatalogException:  # If the table does not exists you get a RuntimeError
             pass
         query = f'CREATE TABLE {table_name} ({", ".join([f"{a} {b}" for a, b in zip(column_names, column_types)])});'
         self.cursor.execute(query)
