@@ -1,5 +1,6 @@
 from typing import List
 
+import duckdb
 from duckdb import DuckDBPyConnection
 
 
@@ -10,7 +11,7 @@ def _create_table(connection: DuckDBPyConnection, table_name: str, column_names:
         cursor.execute(f'SELECT * FROM {table_name} LIMIT 1;')
         connection.rollback()
         raise IOError('Table already exists.')
-    except RuntimeError:
+    except duckdb.CatalogException:
         pass
     query = f'CREATE TABLE {table_name} ({", ".join([f"{a} {b}" for a, b in zip(column_names, column_types)])});'
     cursor.execute(query)
