@@ -50,6 +50,11 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+/geesedb/tests/resources/WP
+/geesedb/tests/test_script.py
+/geesedb/tests/generated_dbs
+/geesedb/index/cython/
+/geesedb/resources/nltk_data
 
 # Translations
 *.mo

@@ -65,21 +65,21 @@ class ToCSV:
         pos += next_pos
 
         # read posting lists
-        term_dict_writer = open(self.arguments['output_term_dict'], 'w')
-        term_doc_writer = open(self.arguments['output_term_doc'], 'w')
+        term_dict_writer = open(self.arguments['output_term_dict'], 'w', encoding="utf-8")
+        term_doc_writer = open(self.arguments['output_term_doc'], 'w', encoding="utf-8")
         postings_list = Ciff.PostingsList()
         for term_id in range(header.num_postings_lists):
             next_pos, pos = self.decode(data, pos)
             postings_list.ParseFromString(data[pos:pos+next_pos])
             pos += next_pos
-            term_dict_writer.write(f'{term_id}|{postings_list.df}|{postings_list.term}\n')
+            term_dict_writer.write(f'{term_id}|{postings_list.term}|{postings_list.df}\n')
             for posting in postings_list.postings:
                 term_doc_writer.write(f'{term_id}|{posting.docid}|{posting.tf}\n')
         term_dict_writer.close()
         term_doc_writer.close()
 
         # read doc information
-        docs_writer = open(self.arguments['output_docs'], 'w')
+        docs_writer = open(self.arguments['output_docs'], 'w', encoding="utf-8")
         doc_record = Ciff.DocRecord()
         for n in range(header.num_docs):
             next_pos, pos = self.decode(data, pos)

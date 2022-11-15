@@ -1,14 +1,15 @@
 from os import path
 
-from ...index import FullTextFromCSV
-from ...connection import close_connection
+from geesedb.index import FullTextFromCSV
+from geesedb.connection import close_connection
+
 
 def test_load_csv_example_files() -> None:
     index = FullTextFromCSV(database=':memory:',
-                            docs_file=path.dirname(path.dirname(__file__)) + '/resources/csv/example_docs.csv',
+                            docs_file=path.dirname(path.dirname(__file__)) + '\\resources\\csv\\example_docs.csv',
                             term_dict_file=path.dirname(
-                                path.dirname(__file__)) + '/resources/csv/example_term_dict.csv',
-                            term_doc_file=path.dirname(path.dirname(__file__)) + '/resources/csv/example_term_doc.csv'
+                                path.dirname(__file__)) + '\\resources\\csv\\example_term_dict.csv',
+                            term_doc_file=path.dirname(path.dirname(__file__)) + '\\resources\\csv\\example_term_doc.csv'
                             )
     index.load_data()
     index.connection.execute("SELECT * FROM docs;")
