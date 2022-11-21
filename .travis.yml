@@ -2,7 +2,6 @@ language: python
 python:
   - "3.6"
 install:
-  - git config --global url
   - pip install -r requirements.txt
 script:
   - pytest
