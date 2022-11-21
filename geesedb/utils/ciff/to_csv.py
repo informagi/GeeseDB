@@ -72,7 +72,7 @@ class ToCSV:
             next_pos, pos = self.decode(data, pos)
             postings_list.ParseFromString(data[pos:pos+next_pos])
             pos += next_pos
-            term_dict_writer.write(f'{term_id}|{postings_list.df}|{postings_list.term}\n')
+            term_dict_writer.write(f'{term_id}|{postings_list.term}|{postings_list.df}\n')
             for posting in postings_list.postings:
                 term_doc_writer.write(f'{term_id}|{posting.docid}|{posting.tf}\n')
         term_dict_writer.close()
