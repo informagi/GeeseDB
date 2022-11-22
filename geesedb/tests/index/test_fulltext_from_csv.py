@@ -1,7 +1,7 @@
 from os import path
 
-from geesedb.index import FullTextFromCSV
-from geesedb.connection import close_connection
+from ...index import FullTextFromCSV
+from ...connection import close_connection
 
 
 def test_load_csv_example_files() -> None:

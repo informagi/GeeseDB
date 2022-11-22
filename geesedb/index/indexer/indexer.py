@@ -63,6 +63,8 @@ class Indexer:
                 sys.stdout.write('\r')
                 sys.stdout.write("Processed documents: %d" % doc_id)
                 sys.stdout.flush()
+            if doc_id == 1000:
+                break
             doc_id += 1
 
         start = time.time()
@@ -81,13 +83,13 @@ class Indexer:
         t5 += time.time() - start
 
         if self.arguments['print_times']:
-            print(f'Running time reading line: {t1} sec')
-            print(f'Running time processing line: {t2} sec')
+            print(f'Running time reading line:                       {t1} sec')
+            print(f'Running time processing line:                    {t2} sec')
             self.processor.print_times()
-            print(f'Running time updating docs: {t3} sec')
+            print(f'Running time updating docs:                      {t3} sec')
             print(f'Running time updating dictionary and terms_docs: {t4} sec')
-            print(f'Running time creating and filling DB: {t5} sec')
-            print(f'Running time: {time.time() - self.init_time} sec')
+            print(f'Running time creating and filling DB:            {t5} sec')
+            print(f'Running time:                                    {time.time() - self.init_time} sec')
 
     @staticmethod
     def get_arguments(kwargs: Any) -> dict:

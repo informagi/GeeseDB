@@ -107,9 +107,9 @@ class TermsProcessor:
         return filtered_tokens
 
     def print_times(self):
-        print('    tokenization: %f sec' % self.a)
+        print('    tokenization:                               %f sec' % self.a)
         print('    selecting word for stemming and stop words: %f sec' % self.b)
-        print('    stemming: %f sec' % self.c)
+        print('    stemming:                                   %f sec' % self.c)
 
     def download_nltk_data(self) -> None:
         # create path to data
