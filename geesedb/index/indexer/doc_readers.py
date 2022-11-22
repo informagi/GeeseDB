@@ -5,28 +5,30 @@ doc_general = {'collection_id': None,
                'doc_id': None,
                'title': '',
                'date': '',
-               'authors': [],
+               'authors': '',
                'content': '',
                'others': {}}
 
 
 def read_from_WaPo_json(line: {}, doc_id: int, include_links: bool) -> doc_general:
     """
-    Read input docs from JSONL file and convert it to the general format.
+    Read input docs from the JSONL file and convert it to the general format.
     """
     if line['id'] is None:
         raise IOError('Missing collection ID')
     d: doc_general = {'collection_id': line['id'], 'doc_id': doc_id, 'title': line['title'],
-                      'date': line['published_date'], 'authors': [author for author in line['author'].split(',')]}
-    # in case authors are separated by commas
+                      'date': line['published_date'], 'authors': line['author']}
+    # 'authors': [author for author in line['author'].split(',')]
     text = ''
     if 'contents' in line:
         for dict_ in line['contents']: #types: kicker, title, image (fullcaption), byline, sanitized_html
             if (dict_ is not None) and ('content' in dict_) and ('type' in dict_):
-                if dict_['type'] == 'kicker' or dict_['type'] == 'title':
+                if dict_['type'] == 'kicker' or dict_['type'] == 'title' or \
+                        (dict_['type'] == 'sanitized_html' and dict_['mime'] == 'text/plain'):
                     text += str(dict_['content']) + ' '
-                elif dict_['type'] == 'sanitized_html':
-                    text += str(extract_plain_text(HTMLTree.parse(dict_['content']), links=include_links, list_bullets=False)) + ' '
+                elif dict_['type'] == 'sanitized_html' and dict_['mime'] == 'text/html':
+                    text += str(extract_plain_text(HTMLTree.parse(dict_['content']), links=include_links,
+                                                   list_bullets=False)) + ' '
         d['content'] = text
     elif 'content' in line:
         d['content'] = line['content']
@@ -34,8 +36,8 @@ def read_from_WaPo_json(line: {}, doc_id: int, include_links: bool) -> doc_gener
         raise IOError('Contents in the .jl file not found.')
 
     # for any other key not mentioned before, its content goes to others
-    for k in line.keys():
-        if k not in d.keys():
-            d['others'] = line[k]
+    # for k in line.keys():
+    #     if k not in d.keys():
+    #         d['others'] = line[k]
 
     return d

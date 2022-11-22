@@ -7,3 +7,5 @@ git+git://github.com/informagi/pycypher
 setuptools~=57.0.0
 
 nltk~=3.7
+Resiliparse~=0.13.5
+syntok~=1.4.4

@@ -30,6 +30,7 @@ pytest
 ```
 
 ## How do I index?
+### CSV files
 The fastest way to load text data into GeeseDB is through CSV files. There should be three csv files: one for terms, one for documents, and one that connects the terms to the documents. Small examples of these files can be found in the repository: [docs.csv](./geesedb/tests/resources/csv/example_docs.csv), [terms_dics.csv](./geesedb/tests/resources/csv/example_term_dict.csv), and [term_doc.csv](./geesedb/tests/resources/csv/example_term_doc.csv).
 
 These can be generated using the CIFF [to_csv](./geesedb/utils/ciff/to_csv.py) class from [CIFF](https://github.com/osirrc/ciff) collections, or you can create them however you like. The documents can be loaded using the following code:
@@ -44,6 +45,49 @@ index = FullTextFromCSV(
     term_doc_file='/path/to/term_doc.csv'
 )
 index.load_data()
+```
+
+### JSONL file
+Another way to load data into GeeseDB is through a JSONL file. Currently, only documents with the TREC Washington Post Corpus (found [here](https://trec.nist.gov/data/wapost/)) format are supported. Each line in this file is structured like so:
+````python
+{
+    'id': str,
+    'article_url': str,
+    'title': str,
+    'author': str,
+    'published_date': int,
+    'contents': [
+        {
+            'content': str,
+            'type': str,
+            'subtype': str,
+            'mime': str
+        }
+    ]
+}
+````
+Where relevant ``type`` values include ``title`` and ``kicker``, and ``mime`` can either be ``text/html`` or ``text/plain``, depending on the presence of html in ``content``.
+
+To index a collection of documents:
+````python
+from geesedb.index import Indexer
+
+indexer = Indexer(
+    database='/path/to/database',
+    file='/path/to/file'
+)
+indexer.open_and_run()
+````
+
+A few options can be chosen such as ``tokenization_method``, which can be set either to ``syntok``, ``nltk`` or any other specified function. The stop words set ``stop_words`` can be initialized with ``nltk``, ``lucene`` or ``None``, in which case only the characters in ``delete_chars`` will be included in the stop word list. The stemmer options are ``porter`` and ``snowball``, and in the case of the last one, the language can be specified in ``language``  from any of the nltk available options.
+
+From [the nltk documentation](https://www.nltk.org/api/nltk.stem.snowball.html):
+```python
+>>> from nltk.stem import SnowballStemmer
+>>> print(" ".join(SnowballStemmer.languages)) # See which languages are supported
+arabic danish dutch english finnish french german hungarian
+italian norwegian porter portuguese romanian russian
+spanish swedish
 ```
 
 ## How do I search?

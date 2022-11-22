@@ -1,6 +1,5 @@
 from typing import List
-
-from duckdb import DuckDBPyConnection, CatalogException
+from duckdb import DuckDBPyConnection
 
 
 def _create_table(connection: DuckDBPyConnection, table_name: str, column_names: List[str],
@@ -34,6 +33,3 @@ def _create_and_fill_empty_table_with_pd(connection: DuckDBPyConnection, table_n
     cursor.execute(f'DROP TABLE IF EXISTS {table_name};')
     cursor.register(table_name, pd_dataframe)
     cursor.execute(f"CREATE TABLE {table_name} AS SELECT * FROM {table_name};")
-    #cursor.execute(f"SELECT count(*) FROM {table_name}")
-    #print(cursor.fetchall())
-
