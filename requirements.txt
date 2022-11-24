@@ -1,6 +1,6 @@
 duckdb
 google>=2
-protobuf==3.20
+protobuf==3.20.2
 numpy
 pandas
 git+https://github.com/informagi/pycypher
