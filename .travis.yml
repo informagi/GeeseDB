@@ -1,9 +1,0 @@
-language: python
-python:
-  - "3.6"
-install:
-  - travis_wait pip install -r requirements.txt
-script:
-  - pytest
-notifications:
-  slack: ru-data-science:rSZORzal75Br6WRdUgQ5Rz0S
