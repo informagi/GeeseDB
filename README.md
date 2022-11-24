@@ -122,3 +122,21 @@ c_query = "cypher query"
 translator = Translator('path/to/database')
 sql_query = translator.translate(c_query)
 ```
+
+## Cite
+GeeseDB was published at DESIRES: [Read here](https://ceur-ws.org/Vol-2950/paper-11.pdf)
+
+If you use GeeseDB you can cite use using bibtex:
+```
+@inproceedings{geesedb,
+	author    = {Chris Kamphuis and Arjen P. de Vries},
+	title     = {{GeeseDB: A Python Graph Engine for Exploration and Search}},
+	booktitle = {Proceedings of the 2nd International Conference on Design of Experimental Search \& Information REtrieval Systems},
+	pages     = {10-18},
+	year      = {2021},
+	url       = {http://ceur-ws.org/Vol-2950/paper-11.pdf},
+	address   = {Aachen},
+	publisher = {CEUR-WS.org},
+	series    = {DESIRES '21}
+}
+```
