@@ -13,6 +13,6 @@ def test_create_csv_from_ciff(tmp_path: str) -> None:
     with open(str(tmp_path) + 'docs.csv') as f:
         assert f.readline().strip() == 'WSJ_1|0|6'
     with open(str(tmp_path) + 'term_dict.csv') as f:
-        assert f.readline().strip() == '0|1|01'
+        assert f.readline().strip() == '0|01|1'
     with open(str(tmp_path) + 'term_doc.csv') as f:
         assert f.readline().strip() == '0|0|1'
