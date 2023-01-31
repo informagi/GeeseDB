@@ -1,114 +1,138 @@
-from ..utils import _create_and_fill_empty_table_with_pd
+from ..utils import _create_and_fill_metadata_table, _read_json_file, _get_indexable_line, _alter_docs_table, \
+    _update_mem_terms_table, _create_final_tables, _create_main_tables
 from ...connection import get_connection
-from ..indexer.doc_readers import read_from_WaPo_json
 from ..indexer.terms_processor import TermsProcessor
+from ..automatic_schema.schema import infer_variable
 
-import os
-import pandas as pd
 import json
+import os
 import pathlib
 import time
 import sys
-from collections import Counter
 from typing import Any
+import numpy as np
+import pandas as pd
 
 
 class Indexer:
     """
     Reads, processes and introduces documents of JSONL format in GeeseDB.
     """
-
     def __init__(self, **kwargs: Any) -> None:
         self.arguments = self.get_arguments(kwargs)
-        self.read = read_from_WaPo_json
-        self.line = {}
-        self.db_docs = {self.arguments['columns_names_docs'][0]: [],
-                        self.arguments['columns_names_docs'][1]: [],
-                        self.arguments['columns_names_docs'][2]: []}
-        self.db_terms = {}
-        self.db_terms_docs = {self.arguments['columns_names_term_doc'][0]: [],
-                              self.arguments['columns_names_term_doc'][1]: [],
-                              self.arguments['columns_names_term_doc'][2]: []}
+        if self.arguments['use_existing_db'] and os.path.isfile(self.arguments['database']) or \
+                not self.arguments['use_existing_db'] and not os.path.isfile(self.arguments['database']):
+            pass
+        elif not self.arguments['use_existing_db']:
+            raise IOError('There already exist a file on this path.')
         db_connection = get_connection(self.arguments['database'])
         self.connection = db_connection.connection
         self.processor = TermsProcessor(self.arguments)
+        self.schema = None
         self.init_time = 0
 
-    def open_and_run(self) -> None:
-        self.init_time = time.time()
-        if pathlib.Path(self.arguments['file']).suffix == '.jl':
-            with open(self.arguments['file'], encoding=self.arguments['encoding']) as file:
-                self.run_indexer(file)
-        else:
+    def run(self) -> None:
+        if pathlib.Path(self.arguments['file']).suffix not in ['.jl', '.json']:
             raise IOError('Please provide a valid file')
 
-    def run_indexer(self, file) -> None:
-        t1 = t2 = t3 = t4 = t5 = doc_id = 0
+        t0 = t1 = t2 = t3 = t4 = t5 = 0
+        self.init_time = time.time()
 
-        for line in file:
-            self.line = json.loads(line)
+        doc_rows, raw_dict_line = _read_json_file(self.connection, self.arguments['file'])
+        self.schema = infer_variable(self.connection, json.loads(raw_dict_line).keys(),
+                                     self.processor.tokenizer_function) \
+            if (self.arguments['infer_schema'] or self.arguments['schema_dict'] is not None) else None
+        t0 += time.time() - self.init_time
+
+        if self.schema is None:
+            raise Exception('Please provide a valid schema or toggle the automatic schema infer parameter on')
+        collection_id_field_name = None
+        for k in self.schema.keys():
+            if self.schema[k] == '<doc_id>':
+                collection_id_field_name = k
+                break
+
+        # create all tables
+        _create_main_tables(self.connection, collection_id_field_name, doc_rows)
+        indexable_column_names = "("
+        for k in self.schema.keys():
+            if self.schema[k] == '<metadata>':
+                _create_and_fill_metadata_table(self.connection, k)
+            elif self.schema[k] == '<indexable>':
+                indexable_column_names += f"json_object.json->>'{k}', ' ', "
+        if indexable_column_names == "(":
+            raise IOError("This database does not contain any indexable text or it has not been specified.")
+        indexable_column_names = indexable_column_names[:-2] + ")"
+
+        doc_id = 1  # starts at 1 because of how it's created in SQL
+        for i in range(int(np.ceil(doc_rows/self.arguments['batch_size']))):
+            s = time.time()
+            lines_list = _get_indexable_line(self.connection, indexable_column_names, self.arguments['batch_size'], i)
+            t1 += time.time() - s
+            processed_lines = {'doc_id': [], 'len': [], 'tokens': []}
+
+            for line in lines_list:
+                # process line, save in memory
+                start = time.time()
+                tokens, tokens_str = self.processor.process(line[0])
+                tokens_str = tokens_str[:-4]
+                tokens_str = tokens_str.replace('%doc_id', str(doc_id))
+                t2 += time.time() - start
+                processed_lines['tokens'].append(tokens_str)
+                processed_lines['doc_id'].append(doc_id)
+                processed_lines['len'].append(len(tokens))
+
+                if doc_id % 1000 == 0:
+                    sys.stdout.write('\r')
+                    sys.stdout.write(f"Processed documents: {doc_id}/{doc_rows} "
+                                     f"({np.round(doc_id * 100 / doc_rows, 2)}%) "
+                                     f"Overall avg. speed: {np.round(doc_id / (time.time() - self.init_time), 2)} "
+                                     f"docs/sec")
+                    sys.stdout.flush()
+                if doc_id == doc_rows:
+                    sys.stdout.write('\r')
+
+                doc_id += 1
+
+            # update docs and term_docs
+            df = pd.DataFrame.from_dict(processed_lines)
             start = time.time()
-            self.line = self.read(self.line, doc_id, self.arguments['include_html_links'])
-            t1 += time.time() - start
-            start = time.time()
-            self.line['content'] = self.processor.process(self.line['content'])
-            t2 += time.time() - start
-            start = time.time()
-            self.update_docs_file(doc_id)
+            _alter_docs_table(self.connection, df)
             t3 += time.time() - start
             start = time.time()
-            self.update_terms_termsdocs_file()
+            _update_mem_terms_table(self.connection, ', '.join(processed_lines['tokens']))
             t4 += time.time() - start
-            if doc_id % 100 == 0:
-                sys.stdout.write('\r')
-                sys.stdout.write("Processed documents: %d" % doc_id)
-                sys.stdout.flush()
-            if doc_id == 1000:
-                break
-            doc_id += 1
 
         start = time.time()
-        df_docs = pd.DataFrame.from_dict(self.db_docs)
-        new_db_terms = {self.arguments['columns_names_term_dict'][0]: [],
-                        self.arguments['columns_names_term_dict'][1]: [],
-                        self.arguments['columns_names_term_dict'][2]: []}
-        for item in self.db_terms.items():
-            new_db_terms['string'].append(item[0])
-            new_db_terms['term_id'].append(item[1][0])
-            new_db_terms['df'].append(item[1][1])
-        df_terms = pd.DataFrame.from_dict(new_db_terms)
-        df_terms_docs = pd.DataFrame.from_dict(self.db_terms_docs)
-
-        self.create_and_fill_tables([df_docs, df_terms, df_terms_docs])
+        _create_final_tables(self.connection)
         t5 += time.time() - start
 
         if self.arguments['print_times']:
+            print(f'Running time schema infer:                       {t0} sec')
             print(f'Running time reading line:                       {t1} sec')
             print(f'Running time processing line:                    {t2} sec')
             self.processor.print_times()
             print(f'Running time updating docs:                      {t3} sec')
             print(f'Running time updating dictionary and terms_docs: {t4} sec')
-            print(f'Running time creating and filling DB:            {t5} sec')
+            print(f'Running time filling final tables:               {t5} sec')
             print(f'Running time:                                    {time.time() - self.init_time} sec')
 
     @staticmethod
     def get_arguments(kwargs: Any) -> dict:
         arguments = {
             'database': None,
-            #'use_existing_db': False,
-            #'use_existing_tables': False,
-            'create_nltk_data': True,
-            'print_times': True,
+            'infer_schema': True,
+            'schema_dict': None,
+            'use_existing_db': False,
+            'create_nltk_data': False,
+            'print_times': False,
             'include_html_links': False,
             'tokenization_method': 'syntok',
             'stop_words': 'lucene',
             'stemmer': 'porter',
-            'table_names': ['docs', 'term_dict', 'term_doc'],
-            'columns_names_docs': ['collection_id', 'doc_id', 'len'],
-            'columns_names_term_dict': ['term_id', 'string', 'df'],
-            'columns_names_term_doc': ['term_id', 'doc_id', 'tf'],
+            'batch_size': 1000,
             'file': 'docs.jl',
-            'nltk_path': os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '\\resources\\nltk_data',
+            'nltk_path': os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + r'\resources\nltk_data',
             'language': 'english',
             'encoding': 'utf-8',
             'delimiter': '|',
@@ -121,28 +145,3 @@ class Indexer:
         if arguments['database'] is None:
             raise IOError('database path needs to be provided')
         return arguments
-
-    def create_and_fill_tables(self, dataframe_list: []) -> None:
-        self.connection.begin()
-        for table_name, pd_df in zip(self.arguments['table_names'], dataframe_list):
-            _create_and_fill_empty_table_with_pd(self.connection, table_name, pd_df)
-        self.connection.commit()
-
-    def update_docs_file(self, doc_id: int) -> None:  # input a line, update csv
-        self.db_docs['collection_id'].append(self.line['collection_id'])
-        self.db_docs['doc_id'].append(doc_id)
-        self.db_docs['len'].append(len(self.line['content']))
-
-    def update_terms_termsdocs_file(self) -> None:
-        temp_words = Counter(self.line['content']).keys()  # unique elements
-        temp_vals = Counter(self.line['content']).values()  # counts the elements' frequency
-        for w, t in zip(temp_words, temp_vals):
-            if w not in self.db_terms.keys():
-                i = len(self.db_terms)
-                self.db_terms[w] = [i, 1]  # term_id, df
-                self.db_terms_docs['term_id'].append(i)
-            else:  # find word and update df (once per doc)
-                self.db_terms[w][1] += 1
-                self.db_terms_docs['term_id'].append(self.db_terms[w][0])  # find term id of word w
-            self.db_terms_docs['doc_id'].append(self.line['doc_id'])
-            self.db_terms_docs['tf'].append(t)

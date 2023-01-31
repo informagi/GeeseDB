@@ -48,27 +48,7 @@ index.load_data()
 ```
 
 ### JSONL file
-Another way to load data into GeeseDB is through a JSONL file. Currently, only documents with the TREC Washington Post Corpus (found [here](https://trec.nist.gov/data/wapost/)) format are supported. Each line in this file is structured like so:
-````python
-{
-    'id': str,
-    'article_url': str,
-    'title': str,
-    'author': str,
-    'published_date': int,
-    'contents': [
-        {
-            'content': str,
-            'type': str,
-            'subtype': str,
-            'mime': str
-        }
-    ]
-}
-````
-Where relevant ``type`` values include ``title`` and ``kicker``, and ``mime`` can either be ``text/html`` or ``text/plain``, depending on the presence of html in ``content``.
-
-To index a collection of documents:
+Another way to load data into GeeseDB is through a JSONL file. To index a collection of documents:
 ````python
 from geesedb.index import Indexer
 
@@ -76,12 +56,16 @@ indexer = Indexer(
     database='/path/to/database',
     file='/path/to/file'
 )
-indexer.open_and_run()
+indexer.run()
 ````
+If nothing else is specified, the category of each key will be automatically inferred, which will be used to create the tables.
+This can also be inputted manually while defining the ``Indexer`` with the parameter ``schema_dict``, which can take 4 options:
+`<id>` (only one can be defined), `<indexable>` for text used on the retrieval phase, `<metadata>` for keys that can have a separate table, or `<other>` if the data in that key is not relevant for retrieval.
+Right now the values of the JSONL file should be of numerical type or strings, as strings are not supported yet.
 
-A few options can be chosen such as ``tokenization_method``, which can be set either to ``syntok``, ``nltk`` or any other specified function. The stop words set ``stop_words`` can be initialized with ``nltk``, ``lucene`` or ``None``, in which case only the characters in ``delete_chars`` will be included in the stop word list. The stemmer options are ``porter`` and ``snowball``, and in the case of the last one, the language can be specified in ``language``  from any of the nltk available options.
+A few more parameters can be chosen such as ``tokenization_method``, which can be set either to ``syntok``, ``nltk`` or any other specified function. The stop words set ``stop_words`` can be initialized with ``nltk``, ``lucene`` or ``None``, in which case only the characters in ``delete_chars`` will be included in the stop word list. The stemmer options are ``porter`` and ``snowball``, and in the case of the last one, the language can be specified in ``language``  from any of the nltk available options.
 
-From [the nltk documentation](https://www.nltk.org/api/nltk.stem.snowball.html):
+From [nltk documentation](https://www.nltk.org/api/nltk.stem.snowball.html):
 ```python
 >>> from nltk.stem import SnowballStemmer
 >>> print(" ".join(SnowballStemmer.languages)) # See which languages are supported

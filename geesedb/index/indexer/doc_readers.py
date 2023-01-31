@@ -1,6 +1,9 @@
 from resiliparse.parse.html import HTMLTree
 from resiliparse.extract.html2text import extract_plain_text
 
+from typing import Dict
+import pandas as pd
+
 doc_general = {'collection_id': None,
                'doc_id': None,
                'title': '',
@@ -21,7 +24,7 @@ def read_from_WaPo_json(line: {}, doc_id: int, include_links: bool) -> doc_gener
     # 'authors': [author for author in line['author'].split(',')]
     text = ''
     if 'contents' in line:
-        for dict_ in line['contents']: #types: kicker, title, image (fullcaption), byline, sanitized_html
+        for dict_ in line['contents']:  # types: kicker, title, image (fullcaption), byline, sanitized_html
             if (dict_ is not None) and ('content' in dict_) and ('type' in dict_):
                 if dict_['type'] == 'kicker' or dict_['type'] == 'title' or \
                         (dict_['type'] == 'sanitized_html' and dict_['mime'] == 'text/plain'):
@@ -41,3 +44,12 @@ def read_from_WaPo_json(line: {}, doc_id: int, include_links: bool) -> doc_gener
     #         d['others'] = line[k]
 
     return d
+
+
+def read_raw_json(file_path: str, n_rows: int = 20000) -> Dict:
+    return pd.read_json(file_path, lines=True, nrows=n_rows).to_dict(orient='list')
+
+
+def read_raw_CSV(file_path: str, sep: str = ',', n_rows: int = 20000) -> Dict:
+    # sep='\t' for tab separated file
+    return pd.read_csv(file_path, sep=sep, n_rows=n_rows).to_dict(orient='list')

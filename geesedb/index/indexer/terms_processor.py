@@ -1,6 +1,5 @@
 import os
 import types
-
 import nltk.data
 import time
 from nltk.corpus import stopwords
@@ -12,8 +11,7 @@ from syntok.tokenizer import Tokenizer
 
 class TermsProcessor:
     """
-    Performs stemming and stop words.
-    Uses nltk by default with the process method.
+    Performs tokenization and stemming avoiding stop words.
     Inputs the whole document as a string.
     """
     def __init__(self, arguments):
@@ -66,8 +64,9 @@ class TermsProcessor:
         self.stemmed_tokens = {}
         self.a = self.b = self.c = 0
 
-    def process_syntok(self, line: str) -> str:
+    def process_syntok(self, line: str):
         filtered_tokens = []
+        filtered_tokens_str = "("
         s = time.time()
         for token in self.tokenizer_function(line):
             self.a += time.time() - s
@@ -80,15 +79,13 @@ class TermsProcessor:
                     self.c += time.time() - s
                     self.stemmed_tokens[token.value] = tok
                     filtered_tokens.append(tok)
+                    filtered_tokens_str += "'" + tok.replace("'", "''") + "', %doc_id) , ("
                 else:
                     filtered_tokens.append(self.stemmed_tokens[token.value])
-        # elif self.tokenization_method == 'simple':
-        #     word_tokens = line.split()
-        #     filtered_tokens = [self.stemmer.stem(w.strip(self.delete_chars_str))
-        #                        for w in word_tokens if not w.lower().strip(self.delete_chars_str) in self.stop_words]
-        return filtered_tokens
+                    filtered_tokens_str += "'" + self.stemmed_tokens[token.value].replace("'", "''") + "', %doc_id) , ("
+        return filtered_tokens, filtered_tokens_str
 
-    def process_nltk(self, line: str) -> str:
+    def process_nltk(self, line: str) -> []:
         filtered_tokens = []
         s = time.time()
         for token in self.tokenizer_function(line):
