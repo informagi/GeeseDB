@@ -3,4 +3,5 @@ google>=2
 protobuf==3.20.2
 numpy
 pandas
+tqdm
 git+https://github.com/informagi/pycypher
