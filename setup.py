@@ -7,7 +7,7 @@ setup(
     author='Chris Kamphuis',
     author_email='chris@cs.ru.nl',
     url='https://github.com/informagi/GeeseDB',
-    install_requires=['duckdb', 'numpy', 'pandas', 'protobuf', 'tqdm',
+    install_requires=['duckdb', 'numpy', 'pandas', 'ciff-toolkit', 'tqdm',
                       'pycypher @ git+https://github.com/informagi/pycypher'],
     packages=find_packages(),
     include_package_data=True,

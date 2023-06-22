@@ -4,7 +4,7 @@ import argparse
 import gzip
 from typing import Union, Any, Tuple
 
-from . import CommonIndexFileFormat_pb2 as Ciff
+from ciff_toolkit.read import CiffReader
 
 
 class ToCSV:
@@ -58,37 +58,19 @@ class ToCSV:
                 data = f.read()
         next_pos, pos = 0, 0
 
-        # start with reading header info
-        header = Ciff.Header()
-        next_pos, pos = self.decode(data, pos)
-        header.ParseFromString(data[pos:pos+next_pos])
-        pos += next_pos
+        with CiffReader(self.arguments['protobuf_file']) as reader:
+            with open(self.arguments['output_term_dict'], 'w') as term_dict_writer, \
+                    open(self.arguments['output_term_doc'], 'w') as term_doc_writer:
+                for term_id, postings_list in enumerate(reader.read_postings_lists()):
+                    term_dict_writer.write(f'{term_id}|{postings_list.term}|{postings_list.df}\n')
+                    docid = 0
+                    for posting in postings_list.postings:
+                        docid += posting.docid
+                        term_doc_writer.write(f'{term_id}|{docid}|{posting.tf}\n')
 
-        # read posting lists
-        term_dict_writer = open(self.arguments['output_term_dict'], 'w')
-        term_doc_writer = open(self.arguments['output_term_doc'], 'w')
-        postings_list = Ciff.PostingsList()
-        for term_id in range(header.num_postings_lists):
-            next_pos, pos = self.decode(data, pos)
-            postings_list.ParseFromString(data[pos:pos+next_pos])
-            pos += next_pos
-            term_dict_writer.write(f'{term_id}|{postings_list.term}|{postings_list.df}\n')
-            docid = 0
-            for posting in postings_list.postings:
-                docid += posting.docid
-                term_doc_writer.write(f'{term_id}|{docid}|{posting.tf}\n')
-        term_dict_writer.close()
-        term_doc_writer.close()
-
-        # read doc information
-        docs_writer = open(self.arguments['output_docs'], 'w')
-        doc_record = Ciff.DocRecord()
-        for n in range(header.num_docs):
-            next_pos, pos = self.decode(data, pos)
-            doc_record.ParseFromString(data[pos:pos+next_pos])
-            pos += next_pos
-            docs_writer.write(f'{doc_record.collection_docid}|{doc_record.docid}|{doc_record.doclength}\n')
-        docs_writer.close()
+            with open(self.arguments['output_docs'], 'w') as docs_writer:
+                for doc_record in reader.read_documents():
+                    docs_writer.write(f'{doc_record.collection_docid}|{doc_record.docid}|{doc_record.doclength}\n')
 
 
 if __name__ == '__main__':
