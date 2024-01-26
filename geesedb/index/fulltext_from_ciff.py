@@ -5,9 +5,9 @@ import gzip
 import os
 import duckdb
 from typing import Any, List, Union, Tuple
+from ciff_toolkit.read import CiffReader
 
 from ..connection import get_connection
-from ..utils import CommonIndexFileFormat_pb2 as Ciff
 
 
 class FullTextFromCiff:
@@ -109,49 +109,36 @@ class FullTextFromCiff:
             with open(self.arguments['protobuf_file'], 'rb') as f:
                 data = f.read()
 
-        # start with reading header info
-        next_pos, pos = 0, 0
-        header = Ciff.Header()
-        next_pos, pos = self.decode(data, pos)
-        header.ParseFromString(data[pos:pos + next_pos])
-        pos += next_pos
+        with CiffReader(self.arguments['protobuf_file']) as reader:
+            for term_id, postings_list in enumerate(reader.read_postings_lists()):
+                self.connection.begin()
+                q = f'INSERT INTO {self.arguments["table_names"][1]} ' \
+                    f'({",".join(self.arguments["columns_names_term_dict"])}) ' \
+                    f"VALUES ({term_id},{postings_list.df},'{postings_list.term}')"
+                try:
+                    self.cursor.execute(q)
+                except RuntimeError:
+                    print(q)
 
-        # read posting lists
-        postings_list = Ciff.PostingsList()
-        for term_id in range(header.num_postings_lists):
+                docid = 0
+                for posting in postings_list.postings:
+                    docid += posting.docid
+                    q = f'INSERT INTO {self.arguments["table_names"][2]} ' \
+                        f'({",".join(self.arguments["columns_names_term_doc"])}) ' \
+                        f'VALUES ({term_id},{docid},{posting.tf})'
+                    self.cursor.execute(q)
+                self.connection.commit()
+
             self.connection.begin()
-            next_pos, pos = self.decode(data, pos)
-            postings_list.ParseFromString(data[pos:pos + next_pos])
-            pos += next_pos
-            q = f'INSERT INTO {self.arguments["table_names"][1]} ' \
-                f'({",".join(self.arguments["columns_names_term_dict"])}) ' \
-                f"VALUES ({term_id},{postings_list.df},'{postings_list.term}')"
-            try:
-                self.cursor.execute(q)
-            except RuntimeError:
-                print(q)
-            for posting in postings_list.postings:
-                q = f'INSERT INTO {self.arguments["table_names"][2]} ' \
-                    f'({",".join(self.arguments["columns_names_term_doc"])}) ' \
-                    f'VALUES ({term_id},{posting.docid},{posting.tf})'
+            for n, doc_record in enumerate(reader.read_documents()):
+                if n % 1000 == 0:
+                    self.connection.commit()
+                    self.connection.begin()
+                q = f'INSERT INTO {self.arguments["table_names"][0]} ' \
+                    f'({",".join(self.arguments["columns_names_docs"])}) ' \
+                    f"VALUES ('{doc_record.collection_docid}',{doc_record.docid},{doc_record.doclength})"
                 self.cursor.execute(q)
             self.connection.commit()
-
-        # read doc information
-        doc_record = Ciff.DocRecord()
-        self.connection.begin()
-        for n in range(header.num_docs):
-            if n % 1000 == 0:
-                self.connection.commit()
-                self.connection.begin()
-            next_pos, pos = self.decode(data, pos)
-            doc_record.ParseFromString(data[pos:pos + next_pos])
-            pos += next_pos
-            q = f'INSERT INTO {self.arguments["table_names"][0]} ' \
-                f'({",".join(self.arguments["columns_names_docs"])}) ' \
-                f"VALUES ('{doc_record.collection_docid}',{doc_record.docid},{doc_record.doclength})"
-            self.cursor.execute(q)
-        self.connection.commit()
 
 
 if __name__ == '__main__':

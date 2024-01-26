@@ -1,7 +1,7 @@
 duckdb
 google>=2
-protobuf==3.20.2
 numpy
 pandas
+ciff-toolkit
 tqdm
 git+https://github.com/informagi/pycypher
